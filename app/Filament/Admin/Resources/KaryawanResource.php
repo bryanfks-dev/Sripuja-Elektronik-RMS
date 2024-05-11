@@ -19,17 +19,34 @@ class KaryawanResource extends Resource
 {
     protected static ?string $model = Karyawan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Relasi';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationIcon = 'heroicon-s-user';
+
+    protected static ?string $navigationLabel = 'Karyawan';
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('nama_lengkap')->autocapitalize()->required(),
+                TextInput::make('nama_lengkap')->label('Nama Lengkap')
+                    ->autocapitalize()->required(),
                 TextInput::make('alamat')->autocapitalize()->required(),
-                TextInput::make('no_hp')->numeric()->prefix('+62')->maxLength(13)->required(),
-                TextInput::make('gaji')->numeric()->prefix('Rp.')->required(),
-                Select::make('tipe_karyawan')->options(['non_kasir' => 'Non-Kasir', 'kasir' => 'Kasir'])->native(false),
+                TextInput::make('telepon')->tel()
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
+                TextInput::make('no_hp')->label('Nomor Hp')->tel()
+                    ->maxLength(12)->prefix('+62')
+                    ->telRegex('/^8[1-9][0-9]{6,12}$/')->required(),
+                TextInput::make('gaji')->numeric()->prefix('Rp.')
+                    ->required(),
+                Select::make('tipe_karyawan')->label('Tipe Karyawan')
+                    ->options([
+                        'non_kasir' => 'Non-Kasir',
+                        'kasir' => 'Kasir'])
+                    ->default('non_kasir')->required(),
             ]);
     }
 

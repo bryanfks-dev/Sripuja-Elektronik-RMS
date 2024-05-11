@@ -5,7 +5,12 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\PembelianResource\Pages;
 use App\Filament\Admin\Resources\PembelianResource\RelationManagers;
 use App\Models\Pembelian;
+use App\Models\Supplier;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,13 +22,36 @@ class PembelianResource extends Resource
 {
     protected static ?string $model = Pembelian::class;
 
+    protected static ?string $navigationGroup = 'Data Transaksi';
+
+    protected static ?string $navigationLabel = 'Pembelian';
+
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Select::make('id_supplier')->label('Nama Supplier')
+                    ->options(Supplier::all()
+                        ->pluck('Nama', 'Id_Supplier'))->searchable()
+                    ->createOptionForm(
+                        fn(Form $form) => SupplierResource::form($form)
+                    )
+                    ->required(),
+                TextInput::make('no_nota')->label('Nomor Nota')
+                    ->required(),
+                DateTimePicker::make('tanggal_waktu')->label('Tanggal & Waktu Pembelian')
+                    ->seconds(false),
+                DatePicker::make('tanggal_jatuh_tempo')->label('Jatuh Tempo Pembayaran')
+                    ->required(),
+                Select::make('status')->label('Status Pembayaran')
+                    ->options([
+                        'belum_lunas' => 'Belum Lunas',
+                        'lunas' => 'Lunas'
+                    ])->default('belum_lunas')->required()
             ]);
     }
 

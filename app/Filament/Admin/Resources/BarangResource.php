@@ -19,17 +19,24 @@ class BarangResource extends Resource
 {
     protected static ?string $model = Barang::class;
 
+    protected static ?string $navigationLabel = 'Master Barang';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('kode_barang')->required(),
-                TextInput::make('nama_barang')->required(),
-                TextInput::make('harga_jual')->integer()->prefix('Rp.')->required(),
-                TextInput::make('harga_beli')->integer()->prefix('Rp.')->required(),
-                TextInput::make('harga_grosir')->integer()->prefix('Rp.')->required(),
+                TextInput::make('kode_barang')->label('Kode Barang')
+                    ->required(),
+                TextInput::make('nama_barang')->label('Nama Barang')
+                    ->required(),
+                TextInput::make('harga_jual')->label('Harga Jual')
+                    ->integer()->prefix('Rp.')->required(),
+                TextInput::make('harga_beli')->label('Harga Beli')
+                    ->integer()->prefix('Rp.')->required(),
+                TextInput::make('harga_grosir')->label('Harga Grosir')
+                    ->integer()->prefix('Rp.')->required(),
             ]);
     }
 

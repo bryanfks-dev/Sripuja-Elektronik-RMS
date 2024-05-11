@@ -18,19 +18,32 @@ class SupplierResource extends Resource
 {
     protected static ?string $model = Supplier::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Relasi';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationIcon = 'heroicon-m-building-office';
+
+    protected static ?string $navigationLabel = 'Supplier';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('Nama')->required(),
-                TextInput::make('Alamat')->required(),
-                TextInput::make('telepon')->numeric(),
-                TextInput::make('no_hp')->numeric()->maxLength(13)->prefix('+62')->required(),
-                TextInput::make('fax')->numeric(),
-                TextInput::make('nama_sales')->required(),
-                TextInput::make('no_hp_sales')->numeric()->maxLength(13)->prefix('+62')->required(),
+                TextInput::make('nama')->autocapitalize()->required(),
+                TextInput::make('alamat')->autocapitalize()->required(),
+                TextInput::make('telepon')->tel()
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
+                TextInput::make('no_hp')->label('Nomor Hp')->tel()
+                    ->prefix('+62')->maxLength(13)
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/')->required(),
+                TextInput::make('fax')->tel()
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
+                TextInput::make('nama_sales')->label('Nama Sales')
+                    ->autocapitalize()->required(),
+                TextInput::make('no_hp_sales')->label('Nomor Hp Sales')
+                    ->tel()->prefix('+62')->maxLength(13)
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/')->required(),
             ]);
     }
 

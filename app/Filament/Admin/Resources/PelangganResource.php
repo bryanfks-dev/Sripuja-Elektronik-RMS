@@ -18,16 +18,28 @@ class PelangganResource extends Resource
 {
     protected static ?string $model = Pelanggan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Relasi';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationIcon = 'heroicon-s-users';
+
+    protected static ?string $navigationLabel = 'Pelanggan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('nama_lengkap')->autocapitalize()->required(),
+                TextInput::make('nama_lengkap')->label('Nama Lengkap')
+                    ->autocapitalize()->required(),
                 TextInput::make('alamat')->autocapitalize(),
-                TextInput::make('no_hp')->maxLength(13)->numeric()->prefix('+62'),
-                TextInput::make('fax')->numeric(),
+                TextInput::make('telepon')->tel()
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
+                TextInput::make('no_hp')->label('Nomor Hp')->tel()
+                    ->prefix('+62')->maxLength(12)
+                    ->telRegex('/^8[1-9][0-9]{6,12}$/'),
+                TextInput::make('fax')->tel()
+                    ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
             ]);
     }
 
