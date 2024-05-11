@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Filament\Auth;
-use Filament\Forms\Components\Component;
+namespace App\Filament\Karyawan\Auth;
 use Filament\Pages\Auth\Login;
+use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Validation\ValidationException;
 
-class UsernameLogin extends Login
+class CustomKaryawanLogin extends Login
 {
     protected function getForms(): array
     {
@@ -36,7 +37,7 @@ class UsernameLogin extends Login
     protected function getCredentialsFromFormData(array $data): array
     {
         return [
-            'name' => $data['username'],
+            'username' => $data['username'],
             'password' => $data['password'],
         ];
     }
