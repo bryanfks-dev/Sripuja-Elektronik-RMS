@@ -26,6 +26,11 @@ class KaryawanPanelProvider extends PanelProvider
         return $panel
             ->id('karyawan')
             ->path('/')
+            ->favicon(asset('images/favicon.svg'))
+            ->brandName('Sripuja Electornik MS')
+            ->brandLogo( asset('images/logo_light.svg'))
+            ->darkModeBrandLogo( asset('images/logo_dark.svg'))
+            ->brandLogoHeight('2.8rem')
             ->login(CustomKaryawanLogin::class)
             ->colors([
                 'primary' => Color::Yellow,

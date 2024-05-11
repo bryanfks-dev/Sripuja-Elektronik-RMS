@@ -3,10 +3,15 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Auth\CustomAdminLogin;
+use App\Filament\Admin\Resources\KaryawanResource;
+use App\Filament\Admin\Resources\PelangganResource;
+use App\Filament\Admin\Resources\SupplierResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
+use Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -27,7 +32,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->favicon(asset('images/favicon.svg'))
+            ->brandName('Sripuja Elektronik MS')
+            ->brandLogo( asset('images/logo_light.svg'))
+            ->darkModeBrandLogo( asset('images/logo_dark.svg'))
+            ->brandLogoHeight('2.8rem')
             ->login(CustomAdminLogin::class)
+            ->passwordReset(ResetPassword::class)
             ->colors([
                 'primary' => Color::Rose,
             ])
