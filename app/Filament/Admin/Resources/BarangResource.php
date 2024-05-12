@@ -23,8 +23,6 @@ class BarangResource extends Resource
 
     protected static ?string $navigationLabel = 'Master Barang';
 
-
-
     public static function form(Form $form): Form
     {
         return $form

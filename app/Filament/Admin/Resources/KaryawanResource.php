@@ -41,7 +41,7 @@ class KaryawanResource extends Resource
                     ->maxLength(12)->prefix('+62')
                     ->telRegex('/^8[1-9][0-9]{6,12}$/')->required(),
                 TextInput::make('gaji')->numeric()->prefix('Rp.')
-                    ->required(),
+                    ->minValue(1)->required(),
                 Select::make('tipe_karyawan')->label('Tipe Karyawan')
                     ->options([
                         'non_kasir' => 'Non-Kasir',

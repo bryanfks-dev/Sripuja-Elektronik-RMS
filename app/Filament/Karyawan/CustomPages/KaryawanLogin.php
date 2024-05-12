@@ -1,26 +1,20 @@
 <?php
 
-namespace App\Filament\Admin\Auth;
+namespace App\Filament\Karyawan\CustomPages;
 use Filament\Pages\Auth\Login;
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Validation\ValidationException;
 
-class CustomAdminLogin extends Login
+class KaryawanLogin extends Login
 {
-    public function getHeading(): string | Htmlable
-    {
-        return __('Sign In Admin');
-    }
-
     protected function getForms(): array
     {
         return [
             'form' => $this->form(
                 $this->makeForm()
                     ->schema([
-                        $this->getUsernameEmailFormComponent(),
+                        $this->getUsernameFormComponent(),
                         $this->getPasswordFormComponent(),
                         $this->getRememberFormComponent(),
                     ])
@@ -29,10 +23,10 @@ class CustomAdminLogin extends Login
         ];
     }
 
-    protected function getUsernameEmailFormComponent(): Component
+    protected function getUsernameFormComponent(): Component
     {
-        return TextInput::make('username-email')
-            ->label(__('Username / Email'))
+        return TextInput::make('username')
+            ->label(__('Username'))
             ->required()
             ->autocomplete()
             ->autofocus()
@@ -41,9 +35,8 @@ class CustomAdminLogin extends Login
 
     protected function getCredentialsFromFormData(array $data): array
     {
-        $login_type = filter_var($data['username-email'], FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
         return [
-            $login_type => $data['username-email'],
+            'username' => $data['username'],
             'password' => $data['password'],
         ];
     }
@@ -51,7 +44,7 @@ class CustomAdminLogin extends Login
     protected function throwFailureValidationException(): never
     {
         throw ValidationException::withMessages([
-            'data.username-email' => __('filament-panels::pages/auth/login.messages.failed'),
+            'data.username' => __('filament-panels::pages/auth/login.messages.failed'),
         ]);
     }
 }

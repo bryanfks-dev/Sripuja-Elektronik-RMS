@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Karyawan\Auth\CustomKaryawanLogin;
+use App\Filament\Karyawan\CustomPages\KaryawanLogin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -31,9 +31,9 @@ class KaryawanPanelProvider extends PanelProvider
             ->brandLogo( asset('images/logo_light.svg'))
             ->darkModeBrandLogo( asset('images/logo_dark.svg'))
             ->brandLogoHeight('2.8rem')
-            ->login(CustomKaryawanLogin::class)
+            ->login(KaryawanLogin::class)
             ->colors([
-                'primary' => Color::Yellow,
+                'primary' => Color::Rose,
             ])
             ->discoverResources(in: app_path('Filament/Karyawan/Resources'), for: 'App\\Filament\\Karyawan\\Resources')
             ->discoverPages(in: app_path('Filament/Karyawan/Pages'), for: 'App\\Filament\\Karyawan\\Pages')

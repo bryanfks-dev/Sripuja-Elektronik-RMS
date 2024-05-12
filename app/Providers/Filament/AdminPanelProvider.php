@@ -2,15 +2,12 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Auth\CustomAdminLogin;
-use App\Filament\Admin\Resources\KaryawanResource;
-use App\Filament\Admin\Resources\PelangganResource;
-use App\Filament\Admin\Resources\SupplierResource;
+use App\Filament\Admin\CustomPages\AdminLogin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
+use Filament\Pages\Auth\EditProfile;
 use Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -37,8 +34,15 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo( asset('images/logo_light.svg'))
             ->darkModeBrandLogo( asset('images/logo_dark.svg'))
             ->brandLogoHeight('2.8rem')
-            ->login(CustomAdminLogin::class)
+            ->login(AdminLogin::class)
             ->passwordReset(ResetPassword::class)
+            ->profile(EditProfile::class)
+            // Sort navigation group
+            ->navigationGroups([
+                'Relasi',
+                'Data Transaksi',
+                'Laporan Transaksi',
+            ])
             ->colors([
                 'primary' => Color::Rose,
             ])
