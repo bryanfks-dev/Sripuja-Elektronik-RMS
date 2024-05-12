@@ -14,6 +14,6 @@ class Karyawan extends Model
         'alamat',
         'no_hp',
         'gaji',
-        'tipe_karyawan',
+        'tipe',
     ];
 }
