@@ -22,9 +22,10 @@ class CreateKaryawan extends Command
      *
      * @var string
      */
-    protected $description = 'Membuat user karyawan untuk aplikasi sripuja elektronik MS';
+    protected $description = 'Membuat user karyawan untuk aplikasi Sripuja Elektronik MS';
 
-    protected function isValid($value, $field, $rule) {
+    protected function isValid($value, $field, $rule)
+    {
         $validator = Validator::make([
             $field => $value
         ], [
@@ -34,7 +35,8 @@ class CreateKaryawan extends Command
         return !$validator->fails();
     }
 
-    protected function askValid($question, $field, $rule, $errMsg) {
+    protected function askValid($question, $field, $rule, $errMsg)
+    {
         $input = $this->ask($question);
 
         if (!$this->isValid($input, $field, $rule)) {
@@ -47,7 +49,8 @@ class CreateKaryawan extends Command
         return $input;
     }
 
-    protected function createUsername($fullName) {
+    protected function createUsername($fullName)
+    {
         $username = explode(' ', $fullName);
         $username = $username[0] . '.' . end($username);
 
@@ -59,7 +62,8 @@ class CreateKaryawan extends Command
         return $username;
     }
 
-    protected function createPassword($phoneNum) {
+    protected function createPassword($phoneNum)
+    {
         return Hash::make($phoneNum);
     }
 

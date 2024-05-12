@@ -21,9 +21,10 @@ class CreateAdmin extends Command
      *
      * @var string
      */
-    protected $description = 'Membuat user admin untuk aplikasi sripuja elektronik MS';
+    protected $description = 'Membuat user admin untuk aplikasi Sripuja Elektronik MS';
 
-    protected function isValid($value, $field, $rule) {
+    protected function isValid($value, $field, $rule)
+    {
         $validator = Validator::make([
             $field => $value
         ], [
@@ -33,7 +34,8 @@ class CreateAdmin extends Command
         return !$validator->fails();
     }
 
-    protected function askValid($question, $field, $rule, $errMsg) {
+    protected function askValid($question, $field, $rule, $errMsg)
+    {
         $input = $this->ask($question);
 
         if (!$this->isValid($input, $field, $rule)) {
