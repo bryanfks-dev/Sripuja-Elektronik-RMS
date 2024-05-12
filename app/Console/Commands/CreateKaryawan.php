@@ -68,26 +68,23 @@ class CreateKaryawan extends Command
      */
     public function handle()
     {
-        $karyawan['nama_lengkap'] = $this->ask('Nama Lengkap');
+        $karyawan = [
+            'nama_lengkap' => $this->ask('Nama Lengkap'),
+            'alamat' => $this->ask('Alamat'),
+            'telepon' => $this->askValid('Telepon', 'telepon',
+                'nullable|regex:/(^[(]?[0-9]{1,4}[)]?[0-9]+$)/u', 'Nomor telpon tidak valid'),
+            'no_hp' => $this->askValid('Nomor Hp[628..]', 'no_hp',
+                'required|numeric|regex:/^(628[1-9][0-9]{6,9}$)/u', 'Nomor hp tidak valid'),
+            'gaji' => $this->askValid('Gaji', 'gaji', 'required|numeric|min:1',
+                'Gaji tidak valid'),
+            'tipe' => $this->askValid('Tipe Karyawan[Non-Kasir|Kasir]', 'tipe',
+                'required|in:Non-Kasir,Kasir', 'Tipe karyawan tidak valid, gunakan yang ada')
+        ];
 
-        $karyawan['alamat'] = $this->ask('Alamat');
-
-        $karyawan['telepon'] = $this->askValid('Telepon', 'telepon',
-            'nullable|regex:/(^[(]?[0-9]{1,4}[)]?[0-9]+$)/u', 'Nomor telpon tidak valid');
-
-        $karyawan['no_hp'] = $this->askValid('Nomor Hp[628..]', 'no_hp',
-            'required|numeric|regex:/^(628[1-9][0-9]{6,9}$)/u', 'Nomor hp tidak valid');
-
-        $karyawan['gaji'] = $this->askValid('Gaji', 'gaji',
-            'required|numeric|min:1','Gaji tidak valid');
-
-        $karyawan['tipe'] = $this->askValid('Tipe Karyawan[Non-Kasir|Kasir]',
-            'tipe', 'required|in:Non-Kasir,Kasir',
-            'Tipe karyawan tidak valid, gunakan yang ada');
-
-        $user['username'] = $this->createUsername($karyawan['nama_lengkap']);
-
-        $user['password'] = $this->createPassword($karyawan['no_hp']);
+        $user = [
+            'username' => $this->createUsername($karyawan['nama_lengkap']),
+            'password'=> $this->createPassword($karyawan['no_hp']),
+        ];;
 
         $user = User::create($user);
 

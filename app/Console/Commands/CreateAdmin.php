@@ -50,18 +50,17 @@ class CreateAdmin extends Command
      */
     public function handle()
     {
-        $data['username'] = $this->askValid('Username',
-            'username', 'required|unique:users',
-            'Username sudah dipakai, gunakan username lain.');
+        $admin = [
+            'username' => $this->askValid('Username', 'username', 'required|unique:users',
+                'Username sudah dipakai, gunakan username lain.'),
+            'email' => $this->askValid('Email', 'email', 'required|email|unique:users',
+                'Email sudah dipakai, gunakan email lain.'),
+            'password' => $this->secret('Password'),
+        ];
 
-        $data['email'] = $this->askValid('Email',
-            'email', 'required|email|unique:users',
-            'Email sudah dipakai, gunakan email lain.');
+        $admin['password'] = Hash::make($admin['password']);
 
-        $data['password'] = $this->secret('Password');
-        $data['password'] = Hash::make($data['password']);
-
-        User::create($data);
+        User::create($admin);
 
         $this->info('Akun admin baru berhasil dibuat');
     }
