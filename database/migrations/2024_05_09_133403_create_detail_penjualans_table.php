@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('detail_penjualans', function (Blueprint $table) {
             $table->integer('Id_Barang')->unsigned()->index();
             $table->integer('Id_Penjualan')->unsigned()->index();
-            $table->integer('Jumlah');
-            $table->integer('Harga_Jual');
-            $table->integer('Sub_Total');
+            $table->integer('Jumlah')->unsigned();
+            $table->integer('Harga_Jual')->unsigned();
+            $table->integer('Sub_Total')->unsigned();
 
-            $table->foreign('Id_Barang')->references('Id_Barang')->on('barangs');
-            $table->foreign('Id_Penjualan')->references('Id_Penjualan')->on('penjualans')->onDelete('cascade');
+            $table->foreign('Id_Barang')->references('Id_Barang')
+                ->on('barangs');
+            $table->foreign('Id_Penjualan')->references('Id_Penjualan')
+                ->on('penjualans')->onDelete('cascade');
         });
     }
 

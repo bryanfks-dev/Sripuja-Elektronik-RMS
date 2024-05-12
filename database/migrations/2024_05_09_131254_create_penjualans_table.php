@@ -15,15 +15,13 @@ return new class extends Migration
             $table->integerIncrements('Id_Penjualan')->primary();
             $table->integer('Id_Karyawan')->unsigned()->nullable();
             $table->integer('Id_Pelanggan')->unsigned();
-            $table->integer('Id_Invoice')->unsigned();
             $table->string('No_Nota');
             $table->timestamp('Tanggal_Waktu')->default(now());
-            $table->integer('Sub_Total');
-            $table->integer('Total');
 
-            $table->foreign('Id_Karyawan')->references('Id_Karyawan')->on('karyawans');
-            $table->foreign('Id_Pelanggan')->references('Id_Pelanggan')->on('pelanggans');
-            $table->foreign('Id_Invoice')->references('Id_Invoice')->on('invoices')->onDelete('cascade');
+            $table->foreign('Id_Karyawan')->references('Id_Karyawan')
+                ->on('karyawans');
+            $table->foreign('Id_Pelanggan')->references('Id_Pelanggan')
+                ->on('pelanggans');
 
             $table->timestamps();
         });

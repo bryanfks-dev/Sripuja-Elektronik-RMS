@@ -17,10 +17,11 @@ return new class extends Migration
             $table->string('No_Nota');
             $table->timestamp('Tanggal_Waktu')->default(now());
             $table->date('Tanggal_Jatuh_Tempo');
-            $table->integer('Total')->unsigned();
-            $table->enum('Status', ['Belum Lunas','Lunas'])->default('Belum Lunas');
+            $table->enum('Status', ['Belum Lunas','Lunas'])
+                ->default('Belum Lunas');
 
-            $table->foreign('Id_Supplier')->references('Id_Supplier')->on('suppliers');
+            $table->foreign('Id_Supplier')->references('Id_Supplier')
+                ->on('suppliers');
         });
     }
 

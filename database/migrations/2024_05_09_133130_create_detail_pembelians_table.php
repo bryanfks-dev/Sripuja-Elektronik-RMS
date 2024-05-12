@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('detail_pembelians', function (Blueprint $table) {
             $table->integer('Id_Barang')->unsigned()->index();
             $table->integer('Id_Pembelian')->unsigned()->index();
-            $table->integer('Jumlah');
-            $table->integer('Sub_Total');
+            $table->integer('Jumlah')->unsigned();
+            $table->integer('Sub_Total')->unsigned();
 
-            $table->foreign('Id_Barang')->references('Id_Barang')->on('barangs');
-            $table->foreign('Id_Pembelian')->references('Id_Pembelian')->on('pembelians')->onDelete('cascade');
+            $table->foreign('Id_Barang')->references('Id_Barang')
+                ->on('barangs');
+            $table->foreign('Id_Pembelian')->references('Id_Pembelian')
+                ->on('pembelians')->onDelete('cascade');
 
             $table->timestamps();
         });

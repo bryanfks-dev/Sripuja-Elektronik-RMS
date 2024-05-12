@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('Alamat');
             $table->string('No_Hp', 13);
             $table->integer('Gaji')->unsigned();
-            $table->enum('Tipe_Karyawan', ['Kasir','Non-Kasir'])->default('Non-Kasir');
+            $table->enum('Tipe_Karyawan', ['Kasir','Non-Kasir'])
+                ->default('Non-Kasir');
 
             $table->timestamps();
         });

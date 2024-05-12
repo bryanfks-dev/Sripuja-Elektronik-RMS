@@ -32,11 +32,14 @@ class BarangResource extends Resource
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->required(),
                 TextInput::make('harga_jual')->label('Harga Jual')
-                    ->integer()->prefix('Rp.')->required(),
+                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->required(),
                 TextInput::make('harga_beli')->label('Harga Beli')
-                    ->integer()->prefix('Rp.')->required(),
+                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->required(),
                 TextInput::make('harga_grosir')->label('Harga Grosir')
-                    ->integer()->prefix('Rp.')->required(),
+                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->required(),
             ]);
     }
 
