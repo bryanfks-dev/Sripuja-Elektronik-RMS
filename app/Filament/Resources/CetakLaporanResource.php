@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CetakLaporanResource\Pages;
 use App\Filament\Resources\CetakLaporanResource\RelationManagers;
-use App\Models\CetakLaporan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,8 +14,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CetakLaporanResource extends Resource
 {
-    protected static ?string $model = CetakLaporan::class;
-
     protected static ?string $navigationGroup = 'Laporan Transaksi';
 
     protected static ?int $navigationSort = 2;
@@ -43,7 +40,7 @@ class CetakLaporanResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

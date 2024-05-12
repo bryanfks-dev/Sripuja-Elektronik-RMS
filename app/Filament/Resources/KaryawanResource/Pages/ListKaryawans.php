@@ -13,19 +13,9 @@ class ListKaryawans extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        $actions = [
+        return [
             Actions\CreateAction::make('create')
                 ->icon('heroicon-m-plus')->label('Tambah Karyawan')
         ];
-
-        // Add delete button if karyawan data exists
-        if (Karyawan::exists()) {
-            $delete = Actions\CreateAction::make('delete')
-                ->icon('heroicon-m-trash')->label('Hapus');
-
-            array_unshift($actions, $delete);
-        }
-
-        return $actions;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LaporanPenjualanResource\Pages;
 use App\Filament\Resources\LaporanPenjualanResource\RelationManagers;
-use App\Models\LaporanPenjualan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,8 +14,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LaporanPenjualanResource extends Resource
 {
-    protected static ?string $model = LaporanPenjualan::class;
-
     protected static ?string $navigationGroup = 'Laporan Transaksi';
 
     protected static ?int $navigationSort = 1;
