@@ -10,9 +10,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables;
+use Filament\Tables\Columns\Column;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class KaryawanResource extends Resource
@@ -41,8 +44,9 @@ class KaryawanResource extends Resource
                     ->maxLength(12)->prefix('+62')
                     ->telRegex('/^8[1-9][0-9]{6,12}$/')->required(),
                 TextInput::make('gaji')->numeric()->prefix('Rp.')
+                    ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
                     ->minValue(1)->required(),
-                Select::make('tipe_karyawan')->label('Tipe Karyawan')
+                Select::make('tipe')->label('Tipe Karyawan')
                     ->options([
                         'non_kasir' => 'Non-Kasir',
                         'kasir' => 'Kasir'])
@@ -54,10 +58,18 @@ class KaryawanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('#')->state(fn ($column) => $column->getRowLoop()->iteration),
+                TextColumn::make('nama_lengkap')->label('Nama Karyawan')->searchable(),
+                TextColumn::make('alamat')->searchable(),
+                TextColumn::make('no_hp')->label('Nomor Hp')->searchable(),
+                TextColumn::make('gaji')->money('ID')->sortable(),
+                TextColumn::make('tipe')->label('Tipe Karyawan')->searchable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('tipe')->label('Tipe Karyawan')
+                ->options([
+                    'Non-Kasir', 'Kasir'
+                ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

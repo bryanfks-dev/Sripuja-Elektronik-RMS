@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -32,13 +33,16 @@ class BarangResource extends Resource
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->required(),
                 TextInput::make('harga_jual')->label('Harga Jual')
-                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')->minValue(1)
                     ->required(),
                 TextInput::make('harga_beli')->label('Harga Beli')
-                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')->minValue(1)
                     ->required(),
                 TextInput::make('harga_grosir')->label('Harga Grosir')
-                    ->integer()->prefix('Rp.')->minValue(1)
+                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')->minValue(1)
                     ->required(),
             ]);
     }
