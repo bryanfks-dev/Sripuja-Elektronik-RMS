@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('karyawans', function (Blueprint $table) {
             $table->integerIncrements('id_karyawan')->primary();
-            $table->integer('id_user')->unsigned();
+            $table->bigInteger('id_user')->unsigned();
             $table->string('nama_lengkap');
             $table->string('alamat');
             $table->string('no_hp', 13);
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('tipe', ['Kasir','Non-Kasir'])
                 ->default('Non-Kasir');
 
-            $table->foreign('id_user')->references('id_user')
+            $table->foreign('id_user')->references('id')
                 ->on('users')->onDelete('cascade');
 
             $table->timestamps();

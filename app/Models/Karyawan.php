@@ -10,6 +10,7 @@ class Karyawan extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id_user',
         'nama_lengkap',
         'alamat',
         'no_hp',

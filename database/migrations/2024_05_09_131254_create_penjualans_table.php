@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('penjualans', function (Blueprint $table) {
             $table->integerIncrements('id_penjualan')->primary();
-            $table->integer('id_user')->unsigned();
+            $table->bigInteger('id_user')->unsigned();
             $table->integer('id_pelanggan')->unsigned();
             $table->string('no_nota');
             $table->timestamp('tanggal_waktu')->default(now());
 
-            $table->foreign('id_user')->references('id_user')
+            $table->foreign('id_user')->references('id')
                 ->on('users');
             $table->foreign('id_pelanggan')->references('id_pelanggan')
                 ->on('pelanggans');
