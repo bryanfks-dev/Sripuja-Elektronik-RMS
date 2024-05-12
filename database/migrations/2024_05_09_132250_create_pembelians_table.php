@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pembelians', function (Blueprint $table) {
-            $table->integerIncrements('Id_Pembelian')->primary();
-            $table->integer('Id_Supplier')->unsigned();
-            $table->string('No_Nota');
-            $table->timestamp('Tanggal_Waktu')->default(now());
-            $table->date('Tanggal_Jatuh_Tempo');
-            $table->enum('Status', ['Belum Lunas','Lunas'])
+            $table->integerIncrements('id_pembelian')->primary();
+            $table->integer('id_supplier')->unsigned();
+            $table->string('no_nota');
+            $table->timestamp('tanggal_waktu')->default(now());
+            $table->date('tanggal_jatuh_tempo');
+            $table->enum('status', ['Belum Lunas','Lunas'])
                 ->default('Belum Lunas');
 
-            $table->foreign('Id_Supplier')->references('Id_Supplier')
+            $table->foreign('id_supplier')->references('id_supplier')
                 ->on('suppliers');
         });
     }

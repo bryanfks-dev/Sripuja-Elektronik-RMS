@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detail_penjualans', function (Blueprint $table) {
-            $table->integer('Id_Barang')->unsigned()->index();
-            $table->integer('Id_Penjualan')->unsigned()->index();
-            $table->integer('Jumlah')->unsigned();
-            $table->integer('Harga_Jual')->unsigned();
-            $table->integer('Sub_Total')->unsigned();
+            $table->integer('id_barang')->unsigned()->index();
+            $table->integer('id_penjualan')->unsigned()->index();
+            $table->integer('jumlah')->unsigned();
+            $table->integer('harga_jual')->unsigned();
+            $table->integer('sub_total')->unsigned();
 
-            $table->foreign('Id_Barang')->references('Id_Barang')
+            $table->foreign('id_barang')->references('id_barang')
                 ->on('barangs');
-            $table->foreign('Id_Penjualan')->references('Id_Penjualan')
+            $table->foreign('id_penjualan')->references('id_penjualan')
                 ->on('penjualans')->onDelete('cascade');
         });
     }

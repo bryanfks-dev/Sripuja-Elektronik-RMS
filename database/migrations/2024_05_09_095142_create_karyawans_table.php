@@ -12,15 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('karyawans', function (Blueprint $table) {
-            $table->integerIncrements('Id_Karyawan')->primary();
-            $table->string('Username')->unique();
-            $table->string('Password');
-            $table->string('Nama_Lengkap');
-            $table->string('Alamat');
-            $table->string('No_Hp', 13);
-            $table->integer('Gaji')->unsigned();
-            $table->enum('Tipe', ['Kasir','Non-Kasir'])
+            $table->integerIncrements('id_karyawan')->primary();
+            $table->integer('id_user')->unsigned();
+            $table->string('nama_lengkap');
+            $table->string('alamat');
+            $table->string('no_hp', 13);
+            $table->integer('gaji')->unsigned();
+            $table->enum('tipe', ['Kasir','Non-Kasir'])
                 ->default('Non-Kasir');
+
+            $table->foreign('id_user')->references('id_user')
+                ->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });

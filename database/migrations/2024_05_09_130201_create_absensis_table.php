@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('absensis', function (Blueprint $table) {
-            $table->integer('Id_Karyawan')->unsigned();
-            $table->timestamp('Tanggal_Waktu')->default(now());
+            $table->integer('id_karyawan')->unsigned();
+            $table->timestamp('tanggal_waktu')->default(now());
 
-            $table->foreign('Id_Karyawan')->references('Id_Karyawan')
+            $table->foreign('id_karyawan')->references('id_karyawan')
                 ->on('karyawans')->onDelete('cascade');
         });
     }

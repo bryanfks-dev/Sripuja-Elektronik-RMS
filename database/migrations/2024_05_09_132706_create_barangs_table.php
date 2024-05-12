@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('barangs', function (Blueprint $table) {
-            $table->integerIncrements('Id_Barang')->primary();
-            $table->string('Kode_Barang')->unique();
-            $table->string('Nama_Barang');
-            $table->integer('Stock')->unsigned();
-            $table->integer('Harga_Jual')->unsigned();
-            $table->integer('Harga_Beli')->unsigned();
-            $table->integer('Harga_Grosir')->unsigned();
+            $table->integerIncrements('id_barang')->primary();
+            $table->string('kode_barang')->unique();
+            $table->string('nama_barang');
+            $table->integer('stock')->unsigned();
+            $table->integer('harga_jual')->unsigned();
+            $table->integer('harga_beli')->unsigned();
+            $table->integer('harga_grosir')->unsigned();
 
             $table->timestamps();
         });
