@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('id_user')->unsigned();
             $table->string('nama_lengkap');
             $table->string('alamat');
+            $table->string('telpon');
             $table->string('no_hp', 13);
             $table->integer('gaji')->unsigned();
             $table->enum('tipe', ['Kasir','Non-Kasir'])
