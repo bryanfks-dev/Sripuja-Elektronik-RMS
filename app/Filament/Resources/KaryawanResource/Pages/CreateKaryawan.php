@@ -22,7 +22,7 @@ class CreateKaryawan extends CreateRecord
 
         $user = User::create($user);
 
-        $data['id_user'] = $user->id;
+        $data['user_id'] = $user->id;
 
         return $data;
     }
