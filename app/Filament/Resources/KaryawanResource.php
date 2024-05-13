@@ -43,7 +43,7 @@ class KaryawanResource extends Resource
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
                 TextInput::make('no_hp')->label('Nomor Hp')->tel()
                     ->maxLength(12)->prefix('+62')
-                    ->telRegex('/^8[1-9][0-9]{6,12}$/')->required(),
+                    ->telRegex('/^8[1-9][0-9]{6,10}$/')->required(),
                 TextInput::make('gaji')->numeric()->prefix('Rp.')
                     ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
                     ->minValue(1)->required(),

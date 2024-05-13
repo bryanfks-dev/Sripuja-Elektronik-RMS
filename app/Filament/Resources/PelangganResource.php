@@ -37,7 +37,7 @@ class PelangganResource extends Resource
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
                 TextInput::make('no_hp')->label('Nomor Hp')->tel()
                     ->prefix('+62')->maxLength(12)
-                    ->telRegex('/^8[1-9][0-9]{6,12}$/'),
+                    ->telRegex('/^8[1-9][0-9]{6,10}$/'),
                 TextInput::make('fax')->tel()
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
             ]);
