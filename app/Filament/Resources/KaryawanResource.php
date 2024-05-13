@@ -2,21 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\KaryawanResource\Pages;
-use App\Filament\Resources\KaryawanResource\RelationManagers;
-use App\Models\Karyawan;
 use Filament\Forms;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Support\RawJs;
 use Filament\Tables;
-use Filament\Tables\Columns\Column;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Karyawan;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
+use App\Filament\Resources\KaryawanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\KaryawanResource\RelationManagers;
 
 class KaryawanResource extends Resource
 {
@@ -31,7 +30,6 @@ class KaryawanResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-s-user';
 
     protected static ?string $navigationLabel = 'Karyawan';
-
 
     public static function form(Form $form): Form
     {
@@ -51,9 +49,10 @@ class KaryawanResource extends Resource
                     ->minValue(1)->required(),
                 Select::make('tipe')->label('Tipe Karyawan')
                     ->options([
-                        'non_kasir' => 'Non-Kasir',
-                        'kasir' => 'Kasir'])
-                    ->default('non_kasir')->required(),
+                        'Non-Kasir' => 'Non-Kasir',
+                        'Kasir' => 'Kasir'
+                    ])
+                    ->default('Non-Kasir')->required(),
             ]);
     }
 
@@ -64,7 +63,7 @@ class KaryawanResource extends Resource
                 TextColumn::make('nama_lengkap')->label('Nama Karyawan')->searchable(),
                 TextColumn::make('alamat')->searchable(),
                 TextColumn::make('no_hp')->label('Nomor Hp')->searchable(),
-                TextColumn::make('gaji')->money('ID')->sortable(),
+                TextColumn::make('gaji')->money('Rp ')->sortable(),
                 TextColumn::make('tipe')->label('Tipe Karyawan')->searchable(),
             ])
             ->filters([
