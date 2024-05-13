@@ -10,12 +10,14 @@ use App\Models\Penjualan;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PelangganResource;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PenjualanResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PenjualanResource\RelationManagers;
+use App\Filament\Resources\PenjualanResource\RelationManagers\DetailPenjualanRelationManager;
 
 class PenjualanResource extends Resource
 {
@@ -33,12 +35,11 @@ class PenjualanResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('id_pelanggan')->label('Nama Pelanggan')
-                    ->options(Pelanggan::all()
-                        ->pluck('Nama_Lengkap', 'Id_Pelanggan'))
-                    ->searchable()->createOptionForm(
+                Select::make('pelanggan_id')->label('Nama Pelanggan')
+                    ->options(Pelanggan::all()->pluck('nama_lengkap', 'id'))
+                    ->createOptionForm(
                         fn(Form $form) => PelangganResource::form($form)
-                    )
+                    )->native(false)->preload()->searchable()
                     ->required(),
                 TextInput::make('no_nota')->label('Nomor Nota')
                     ->required(),
@@ -49,13 +50,18 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('pelanggan')->label('Nama Pelanggan')
+                    ->searchable(),
+                TextColumn::make('no_nota')->label('Nomor Nota')
+                    ->searchable(),
+                TextColumn::make('total_pembelian')->label('Total Pembelian')
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->color('white'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -68,7 +74,7 @@ class PenjualanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            //DetailPenjualanRelationManager::class,
         ];
     }
 

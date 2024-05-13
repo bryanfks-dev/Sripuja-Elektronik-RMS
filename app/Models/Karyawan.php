@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Validator;
 
 class Karyawan extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'id_user',
+        'user_id',
         'nama_lengkap',
         'alamat',
+        'telepon',
         'no_hp',
         'gaji',
         'tipe',
@@ -26,13 +26,33 @@ class Karyawan extends Model
     public static function createUsername($fullName)
     {
         $username = explode(' ', $fullName);
-        $username = $username[0] . '.' . end($username);
+        $lastEle = end($username);
 
-        $users = User::where('username', $username)->get();
+        if ($username[0] != $lastEle) {
+            $username = $username[0] . '.' . $lastEle;
+        }
+        else {
+            $username = $username[0];
+        }
 
-        // Check if username exists
+        // Get exact username from user table
+        $users = User::where
+            ('username', 'REGEXP', "^$username\d*")->get();
+
+        // Check alike username found
         if (!$users->isEmpty()) {
-            $username = $username . $users->count();
+            // Get highest number from username
+            $found = preg_match('/\d/',
+                $users->last()->username, $num);
+
+            if ($found) {
+                // Append number to username
+                $username = $username . ($num[0] + 1);
+            }
+            // Case like abc not abc1
+            else {
+                $username = $username . '1';
+            }
         }
 
         return $username;

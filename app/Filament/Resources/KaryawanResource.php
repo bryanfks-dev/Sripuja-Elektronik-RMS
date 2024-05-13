@@ -60,14 +60,15 @@ class KaryawanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama_lengkap')->label('Nama Karyawan')->searchable(),
+                TextColumn::make('nama_lengkap')->label('Nama')->searchable(),
                 TextColumn::make('alamat')->searchable(),
+                TextColumn::make('telepon')->searchable()->placeholder('-'),
                 TextColumn::make('no_hp')->label('Nomor Hp')->searchable(),
                 TextColumn::make('gaji')->money('Rp ')->sortable(),
-                TextColumn::make('tipe')->label('Tipe Karyawan')->searchable(),
+                TextColumn::make('tipe')->label('Pekerjaan')->searchable(),
             ])
             ->filters([
-                SelectFilter::make('tipe')->label('Tipe Karyawan')
+                SelectFilter::make('tipe')->label('Pekerjaan')
                 ->options([
                     'Non-Kasir', 'Kasir'
                 ])

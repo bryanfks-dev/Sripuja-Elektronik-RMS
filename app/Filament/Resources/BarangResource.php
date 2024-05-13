@@ -33,15 +33,15 @@ class BarangResource extends Resource
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->required(),
                 TextInput::make('harga_jual')->label('Harga Jual')
-                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->numeric()->prefix('Rp')->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')->minValue(1)
                     ->required(),
                 TextInput::make('harga_beli')->label('Harga Beli')
-                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->numeric()->prefix('Rp')->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')->minValue(1)
                     ->required(),
                 TextInput::make('harga_grosir')->label('Harga Grosir')
-                    ->numeric()->prefix('Rp.')->mask(RawJs::make('$money($input)'))
+                    ->numeric()->prefix('Rp')->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')->minValue(1)
                     ->required(),
             ]);

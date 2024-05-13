@@ -35,10 +35,9 @@ class PembelianResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('id_supplier')->label('Nama Supplier')
-                    ->options(Supplier::all()
-                        ->pluck('Nama', 'Id_Supplier'))->searchable()
-                    ->createOptionForm(
+                Select::make('supplier_id')->label('Nama Supplier')
+                    ->relationship('supplier', 'id')
+                    ->searchable()->createOptionForm(
                         fn(Form $form) => SupplierResource::form($form)
                     )
                     ->required(),
