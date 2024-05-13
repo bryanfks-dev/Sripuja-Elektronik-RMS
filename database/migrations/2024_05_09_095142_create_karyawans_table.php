@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('karyawans', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->bigInteger('id_user')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
             $table->string('nama_lengkap');
             $table->string('alamat');
-            $table->string('telpon');
+            $table->string('telepon')->nullable();
             $table->string('no_hp', 13);
             $table->integer('gaji')->unsigned();
             $table->enum('tipe', ['Kasir','Non-Kasir'])
                 ->default('Non-Kasir');
 
-            $table->foreign('id_user')->references('id')
+            $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');
         });
     }

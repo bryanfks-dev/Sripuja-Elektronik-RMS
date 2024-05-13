@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('penjualans', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->bigInteger('id_user')->unsigned();
-            $table->integer('id_pelanggan')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
+            $table->integer('pelanggan_id')->unsigned();
             $table->string('no_nota');
-            $table->timestamp('tanggal_waktu')->default(now());
 
-            $table->foreign('id_user')->references('id')
+            $table->foreign('user_id')->references('id')
                 ->on('users');
-            $table->foreign('id_pelanggan')->references('id')
+            $table->foreign('pelanggan_id')->references('id')
                 ->on('pelanggans');
 
             $table->timestamps();

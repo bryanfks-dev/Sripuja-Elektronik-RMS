@@ -12,17 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detail_pembelians', function (Blueprint $table) {
-            $table->integer('id_barang')->unsigned()->index();
-            $table->integer('id_pembelian')->unsigned()->index();
+            $table->integer('barang_id')->unsigned()->index();
+            $table->integer('pembelian_id')->unsigned()->index();
             $table->integer('jumlah')->unsigned();
             $table->integer('sub_total')->unsigned();
 
-            $table->foreign('id_barang')->references('id')
+            $table->foreign('barang_id')->references('id')
                 ->on('barangs');
-            $table->foreign('id_pembelian')->references('id')
+            $table->foreign('pembelian_id')->references('id')
                 ->on('pembelians')->onDelete('cascade');
-
-            $table->timestamps();
         });
     }
 
