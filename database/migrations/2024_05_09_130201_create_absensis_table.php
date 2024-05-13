@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('id_karyawan')->unsigned();
             $table->timestamp('tanggal_waktu')->default(now());
 
-            $table->foreign('id_karyawan')->references('id_karyawan')
+            $table->foreign('id_karyawan')->references('id')
                 ->on('karyawans')->onDelete('cascade');
         });
     }

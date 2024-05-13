@@ -17,9 +17,9 @@ return new class extends Migration
             $table->integer('jumlah')->unsigned();
             $table->integer('sub_total')->unsigned();
 
-            $table->foreign('id_barang')->references('id_barang')
+            $table->foreign('id_barang')->references('id')
                 ->on('barangs');
-            $table->foreign('id_pembelian')->references('id_pembelian')
+            $table->foreign('id_pembelian')->references('id')
                 ->on('pembelians')->onDelete('cascade');
 
             $table->timestamps();

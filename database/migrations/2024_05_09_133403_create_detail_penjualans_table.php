@@ -18,9 +18,9 @@ return new class extends Migration
             $table->integer('harga_jual')->unsigned();
             $table->integer('sub_total')->unsigned();
 
-            $table->foreign('id_barang')->references('id_barang')
+            $table->foreign('id_barang')->references('id')
                 ->on('barangs');
-            $table->foreign('id_penjualan')->references('id_penjualan')
+            $table->foreign('id_penjualan')->references('id')
                 ->on('penjualans')->onDelete('cascade');
         });
     }

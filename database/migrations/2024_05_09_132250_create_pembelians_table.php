@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pembelians', function (Blueprint $table) {
-            $table->integerIncrements('id_pembelian')->primary();
+            $table->integerIncrements('id')->primary();
             $table->integer('id_supplier')->unsigned();
             $table->string('no_nota');
             $table->timestamp('tanggal_waktu')->default(now());
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['Belum Lunas','Lunas'])
                 ->default('Belum Lunas');
 
-            $table->foreign('id_supplier')->references('id_supplier')
+            $table->foreign('id_supplier')->references('id')
                 ->on('suppliers');
         });
     }
