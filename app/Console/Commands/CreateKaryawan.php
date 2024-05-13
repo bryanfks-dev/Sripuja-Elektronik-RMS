@@ -49,32 +49,16 @@ class CreateKaryawan extends Command
         return $input;
     }
 
-    protected function createUsername($fullName)
-    {
-        $username = explode(' ', $fullName);
-        $username = $username[0] . '.' . end($username);
-
-        // Check if username exists
-        if ($count = User::where('username', $username)->count()) {
-            $username = $username . $count;
-        }
-
-        return $username;
-    }
-
-    protected function createPassword($phoneNum)
-    {
-        return Hash::make($phoneNum);
-    }
-
     /**
      * Execute the console command.
      */
     public function handle()
     {
         $karyawan = [
-            'nama_lengkap' => $this->ask('Nama Lengkap'),
-            'alamat' => $this->ask('Alamat'),
+            'nama_lengkap' => $this->askValid('Nama Lengkap', 'nama_lengkap',
+                'required', 'Nama lengkap harus diisi'),
+            'alamat' => $this->askValid('Alamat', 'alamat',
+                'required', 'Alamat harus diisi'),
             'telepon' => $this->askValid('Telepon', 'telepon',
                 'nullable|regex:/(^[(]?[0-9]{1,4}[)]?[0-9]+$)/u', 'Nomor telpon tidak valid'),
             'no_hp' => $this->askValid('Nomor Hp[08..]', 'no_hp',
@@ -86,8 +70,8 @@ class CreateKaryawan extends Command
         ];
 
         $user = [
-            'username' => $this->createUsername($karyawan['nama_lengkap']),
-            'password'=> $this->createPassword($karyawan['no_hp']),
+            'username' => Karyawan::createUsername($karyawan['nama_lengkap']),
+            'password'=> Karyawan::createPassword($karyawan['no_hp']),
         ];;
 
         $user = User::create($user);
