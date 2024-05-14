@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detail_pembelians', function (Blueprint $table) {
+            $table->id();
             $table->integer('barang_id')->unsigned()->index();
             $table->integer('pembelian_id')->unsigned()->index();
             $table->integer('jumlah')->unsigned();

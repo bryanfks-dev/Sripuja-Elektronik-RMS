@@ -15,13 +15,14 @@ return new class extends Migration
             $table->integerIncrements('id')->primary();
             $table->integer('supplier_id')->unsigned();
             $table->string('no_nota');
-            $table->timestamp('tanggal_waktu')->default(now());
-            $table->date('tanggal_jatuh_tempo');
+            $table->date('jatuh_tempo');
             $table->enum('status', ['Belum Lunas','Lunas'])
                 ->default('Belum Lunas');
 
             $table->foreign('supplier_id')->references('id')
                 ->on('suppliers');
+
+            $table->timestamps();
         });
     }
 

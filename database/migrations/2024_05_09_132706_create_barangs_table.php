@@ -15,10 +15,12 @@ return new class extends Migration
             $table->integerIncrements('id')->primary();
             $table->string('kode_barang')->unique();
             $table->string('nama_barang');
-            $table->integer('stock')->unsigned();
+            $table->string('merek');
+            $table->integer('stock')->unsigned()->default(0);
             $table->integer('harga_jual')->unsigned();
             $table->integer('harga_beli')->unsigned();
-            $table->integer('harga_grosir')->unsigned();
+            $table->integer('jumlah_per_grosir')->unsigned()->default(0);
+            $table->integer('harga_grosir')->unsigned()->default(0);
 
             $table->timestamps();
         });
