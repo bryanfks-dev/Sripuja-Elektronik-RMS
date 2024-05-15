@@ -9,7 +9,6 @@ use App\Models\Barang;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
-use App\Models\Pelanggan;
 use App\Models\Penjualan;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
@@ -17,17 +16,11 @@ use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PelangganResource;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PenjualanResource\RelationManagers;
-use App\Filament\Resources\PenjualanResource\RelationManagers\DetailPenjualanRelationManager;
 
 class PenjualanResource extends Resource
 {
