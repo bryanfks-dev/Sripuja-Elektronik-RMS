@@ -46,7 +46,7 @@ class SupplierResource extends Resource
                 TextInput::make('nama_sales')->label('Nama Sales')
                     ->autocapitalize('words')->required(),
                 TextInput::make('no_hp_sales')->label('Nomor Hp Sales')
-                    ->tel()->maxLength(12)->telRegex('/^08[1-9][0-9]{6,10}+$/')
+                    ->tel()->maxLength(13)->telRegex('/^08[1-9][0-9]{6,10}+$/')
                     ->required(),
             ]);
     }

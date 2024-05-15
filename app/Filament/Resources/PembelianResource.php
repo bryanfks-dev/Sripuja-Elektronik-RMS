@@ -57,12 +57,12 @@ class PembelianResource extends Resource
                         TextInput::make('no_nota')->label('Nomor Nota')
                             ->autocapitalize('characters')
                             ->default(Nota::generateNoNotaPembelian())->required(),
+                        TextInput::make('no_faktur')->label('Nomor Faktur')
+                            ->autocapitalize('characters')->required(),
                         DatePicker::make('jatuh_tempo')->label('Jatuh Tempo')
                             ->required(),
                         TextInput::make('tanggal')->default(date('d-m-Y'))
                             ->dehydrated(false)->readOnly(),
-                        TextInput::make('no_faktur')->label('Nomor Faktur')
-                            ->autocapitalize('characters')->required(),
                         Select::make('supplier_id')->label('Nama Supplier')
                             ->relationship('supplier', 'nama')
                             ->searchable()->preload()->native(false)

@@ -39,7 +39,7 @@ class Barang extends Model
 
     public function merekBarang(): BelongsTo
     {
-        return $this->belongsTo(JenisBarang::class);
+        return $this->belongsTo(MerekBarang::class);
     }
 
     public function detailPenjualans(): HasMany
