@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use App\Filament\Resources\LaporanPenjualanResource\Pages;
-use App\Filament\Resources\LaporanPenjualanResource\RelationManagers;
+use App\Filament\Clusters\MasterBarang;
+use App\Filament\Clusters\MasterBarang\Resources\JenisBarangResource\Pages;
+use App\Models\JenisBarang;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class LaporanPenjualanResource extends Resource
+class JenisBarangResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Laporan Transaksi';
+    protected static ?string $cluster = MasterBarang::class;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $model = JenisBarang::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-presentation-chart-line';
+    protected static ?string $pluralModelLabel = 'Jenis Barang';
 
-    protected static ?string $navigationLabel = 'Laporan Penjualan';
+    /* protected static ?string $navigationIcon = 'heroicon-c-square-3-stack-3d'; */
+
+    protected static ?string $navigationLabel = 'Jenis Barang';
 
     public static function form(Form $form): Form
     {
@@ -59,7 +60,9 @@ class LaporanPenjualanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLaporanPenjualans::route('/'),
+            'index' => Pages\ListJenisBarangs::route('/'),
+            'create' => Pages\CreateJenisBarang::route('/create'),
+            'edit' => Pages\EditJenisBarang::route('/{record}/edit'),
         ];
     }
 }

@@ -11,10 +11,10 @@ class CreateKaryawan extends CreateRecord
 {
     protected static string $resource = KaryawanResource::class;
 
+    protected ?string $heading = 'Tambah Karyawan';
+
     protected function mutateFormDataBeforeCreate(array $data):array
     {
-        $data['no_hp'] = '0' . $data['no_hp'];
-
         $user = [
             'username' => Karyawan::createUsername($data['nama_lengkap']),
             'password' => Karyawan::createPassword($data['no_hp']),

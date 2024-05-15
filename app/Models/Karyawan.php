@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\KaryawanType;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,10 @@ class Karyawan extends Model
         'tipe',
     ];
 
+    protected $casts = [
+        'tipe' => KaryawanType::class,
+    ];
+
     public $timestamps = false;
 
     public static function createUsername($fullName)
@@ -36,14 +41,15 @@ class Karyawan extends Model
         }
 
         // Get exact username from user table
-        $users = User::where
-            ('username', 'REGEXP', "^$username\d*")->get();
+        $user = User::where
+            ('username', 'REGEXP', "^$username\d*")->latest()
+            ->get('username');
 
         // Check alike username found
-        if (!$users->isEmpty()) {
+        if (!$user->isEmpty()) {
             // Get highest number from username
             $found = preg_match('/\d/',
-                $users->last()->username, $num);
+                $user[0], $num);
 
             if ($found) {
                 // Append number to username
@@ -61,9 +67,5 @@ class Karyawan extends Model
     public static function createPassword($phoneNum)
     {
         return Hash::make($phoneNum);
-    }
-
-    public function user(): HasOne {
-        return $this->hasOne(User::class);
     }
 }

@@ -1,26 +1,25 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use App\Filament\Resources\CetakLaporanResource\Pages;
-use App\Filament\Resources\CetakLaporanResource\RelationManagers;
+use App\Filament\Clusters\MasterBarang;
+use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
+use App\Models\MerekBarang;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CetakLaporanResource extends Resource
+class MerekBarangResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Laporan Transaksi';
+    protected static ?string $cluster = MasterBarang::class;
+    
+    protected static ?string $model = MerekBarang::class;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $pluralModelLabel = 'Merek Barang';
 
-    protected static ?string $navigationIcon = 'heroicon-s-printer';
-
-    protected static ?string $navigationLabel = 'Cetak Laporan';
+    protected static ?string $navigationLabel = 'Merek Barang';
 
     public static function form(Form $form): Form
     {
@@ -40,7 +39,7 @@ class CetakLaporanResource extends Resource
                 //
             ])
             ->actions([
-                //
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -59,7 +58,9 @@ class CetakLaporanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCetakLaporans::route('/'),
+            'index' => Pages\ListMerekBarangs::route('/'),
+            'create' => Pages\CreateMerekBarang::route('/create'),
+            'edit' => Pages\EditMerekBarang::route('/{record}/edit'),
         ];
     }
 }

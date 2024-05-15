@@ -20,6 +20,10 @@ class PelangganResource extends Resource
 {
     protected static ?string $model = Pelanggan::class;
 
+    protected static ?string $pluralModelLabel = 'Data Pelanggan';
+
+    protected static ?string $slug = 'relasi/pelanggan';
+
     protected static ?string $navigationGroup = 'Relasi';
 
     protected static ?int $navigationSort = 3;
@@ -33,13 +37,13 @@ class PelangganResource extends Resource
         return $form
             ->schema([
                 TextInput::make('nama_lengkap')->label('Nama Lengkap')
-                    ->autocapitalize()->required(),
-                TextInput::make('alamat')->autocapitalize(),
+                    ->autocapitalize('words')->required(),
+                TextInput::make('alamat')->autocapitalize('sentences')
+                    ->autocapitalize(),
                 TextInput::make('telepon')->tel()
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
                 TextInput::make('no_hp')->label('Nomor Hp')->tel()
-                    ->prefix('+62')->maxLength(12)
-                    ->telRegex('/^8[1-9][0-9]{6,10}$/'),
+                    ->maxLength(13)->telRegex('/^08[1-9][0-9]{6,10}$/'),
                 TextInput::make('fax')->tel()
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
             ]);

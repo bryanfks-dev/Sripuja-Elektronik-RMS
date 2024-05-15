@@ -11,6 +11,8 @@ class ListKaryawans extends ListRecords
 {
     protected static string $resource = KaryawanResource::class;
 
+    public ?string $tableSortDirection = 'asc';
+
     protected function getHeaderActions(): array
     {
         return [

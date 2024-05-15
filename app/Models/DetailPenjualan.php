@@ -5,20 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DetailPenjualan extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'id_barang',
-        'id_penjualan',
-        'jumlah'
+        'barang_id',
+        'penjualan_id',
+        'jumlah',
+        'harga_jual',
+        'sub_total',
     ];
 
-    public function penjualan(): BelongsTo
+    public $timestamps = false;
+
+    public function penjualans(): BelongsToMany
     {
-        return $this->belongsTo(Penjualan::class);
+        return $this->belongsToMany(Penjualan::class);
     }
 
     public function barang(): BelongsTo

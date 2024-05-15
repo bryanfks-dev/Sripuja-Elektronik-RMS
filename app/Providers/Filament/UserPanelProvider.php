@@ -5,7 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Auth\CustomLogin;
 use Filament\Pages;
 use Filament\Panel;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -13,7 +12,6 @@ use Filament\Pages\Auth\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use App\Filament\CustomPages\AdminDashboard;
 use Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
@@ -39,6 +37,7 @@ class UserPanelProvider extends PanelProvider
             ->login(CustomLogin::class)
             ->passwordReset(ResetPassword::class)
             ->profile(EditProfile::class)
+            ->viteTheme('resources/css/filament/user/theme.css')
             // Sort navigation group
             ->navigationGroups([
                 'Relasi',
@@ -50,6 +49,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])

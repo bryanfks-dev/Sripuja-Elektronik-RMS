@@ -9,4 +9,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePelanggan extends CreateRecord
 {
     protected static string $resource = PelangganResource::class;
+
+    protected ?string $heading = 'Tambah Pelanggan';
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
 }

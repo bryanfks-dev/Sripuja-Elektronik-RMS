@@ -15,9 +15,16 @@ class Penjualan extends Model
         'user_id',
         'pelanggan_id',
         'no_nota',
+        'no_invoice',
     ];
 
-    public function pelanggan(): BelongsTo {
+    public function pelanggan(): BelongsTo
+    {
         return $this->belongsTo(Pelanggan::class);
+    }
+
+    public function detailPenjualans(): HasMany
+    {
+        return $this->hasMany(DetailPenjualan::class);
     }
 }
