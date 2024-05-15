@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Supplier extends Model
@@ -20,8 +21,8 @@ class Supplier extends Model
         'no_hp_sales',
     ];
 
-    public function pembelian(): HasOne
+    public function pembelians(): HasMany
     {
-        return $this->hasOne(Pembelian::class);
+        return $this->hasMany(Pembelian::class);
     }
 }

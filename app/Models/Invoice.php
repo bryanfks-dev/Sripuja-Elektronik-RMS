@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Invoice extends Model
 {
@@ -27,5 +28,10 @@ class Invoice extends Model
 
         return $base . str_pad(intval($todayLastInvoiceNum), 3,
             '0', STR_PAD_LEFT);
+    }
+
+    public function penjualan(): BelongsTo
+    {
+        return $this->belongsTo(Penjualan::class);
     }
 }

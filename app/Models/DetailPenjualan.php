@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DetailPenjualan extends Model
 {
@@ -21,9 +20,9 @@ class DetailPenjualan extends Model
 
     public $timestamps = false;
 
-    public function penjualans(): BelongsToMany
+    public function penjualan(): BelongsTo
     {
-        return $this->belongsToMany(Penjualan::class);
+        return $this->belongsTo(Penjualan::class);
     }
 
     public function barang(): BelongsTo

@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\DetailPembelian;
 use App\Models\Nota;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use App\Models\Barang;
 use Filament\Forms\Get;
@@ -13,18 +11,21 @@ use Filament\Forms\Form;
 use App\Models\Pembelian;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
+use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Resources\SupplierResource;
 use App\Filament\Resources\PembelianResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
-use Illuminate\Database\Eloquent\Model;
+use App\Filament\Clusters\MasterBarang\Resources\BarangResource;
 
 class PembelianResource extends Resource
 {

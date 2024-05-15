@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
 use App\Filament\Clusters\MasterBarang;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -39,7 +40,21 @@ class BarangResource extends Resource
                     ->unique()->autocapitalize('characters')->required(),
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->autocapitalize('sentences')->required(),
-                TextInput::make('merek')->autocapitalize('characters')
+                Select::make('merek_barang_id')->label('Merek Barang')
+                    ->relationship('merekBarang', 'nama_merek')
+                    ->searchable()->preload()->native(false)
+                            ->createOptionForm(
+                                fn(Form $form) => MerekBarangResource::form($form)
+                                    ->columns(['md' => 2])
+                            )
+                    ->required(),
+                Select::make('jenis_barang_id')->label('Jenis Barang')
+                    ->relationship('jenisBarang', 'nama_jenis')
+                    ->searchable()->preload()->native(false)
+                            ->createOptionForm(
+                                fn(Form $form) => JenisBarangResource::form($form)
+                                    ->columns(['md' => 2])
+                            )
                     ->required(),
                 TextInput::make('jumlah_per_grosir')->label('Jumlah / Grosir')
                     ->numeric()->minValue(0)->default(0)->required(),
@@ -64,14 +79,15 @@ class BarangResource extends Resource
                     ->searchable(),
                 TextColumn::make('nama_barang')->label('Nama Barang')
                     ->searchable(),
-                TextColumn::make('merek')->searchable(),
+                TextColumn::make('merekBarang.nama_merek')->label('Merek')
+                    ->searchable(),
+                TextColumn::make('jenisBarang.nama_jenis')->label('Jenis')
+                    ->searchable(),
                 TextColumn::make('stock')->numeric()->sortable(),
                 TextColumn::make('harga_jual')->label('Harga Jual')
                     ->money('Rp ')->sortable(),
                 TextColumn::make('harga_beli')->label('Harga Beli')
                     ->money('Rp ')->sortable(),
-                TextColumn::make('jumlah_per_grosir')->label('Jumlah / Grosir')
-                    ->numeric()->sortable(),
                 TextColumn::make('harga_grosir')->label('Harga Grosir')
                     ->money('Rp ')->sortable(),
                 TextColumn::make('updated_at')->label('Update Terkahir')

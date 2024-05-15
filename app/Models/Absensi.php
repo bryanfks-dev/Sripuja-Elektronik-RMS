@@ -10,7 +10,8 @@ class Absensi extends Model
 {
     use HasFactory;
 
-    public function karyawan(): HasMany {
+    public function karyawans(): HasMany
+    {
         return $this->hasMany(Karyawan::class);
     }
 }
