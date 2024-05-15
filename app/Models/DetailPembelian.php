@@ -19,7 +19,7 @@ class DetailPembelian extends Model
 
     public $timestamps = false;
 
-    public function pembelians(): BelongsTo
+    public function pembelian(): BelongsTo
     {
         return $this->belongsTo(Penjualan::class);
     }

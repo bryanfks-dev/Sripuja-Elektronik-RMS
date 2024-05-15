@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\KaryawanType;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -75,8 +74,8 @@ class Karyawan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function absensis(): BelongsToMany
+    public function absensis(): HasOne
     {
-        return $this->belongsToMany(Absensi::class);
+        return $this->hasOne(Absensi::class);
     }
 }

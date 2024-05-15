@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Penjualan extends Model
 {
@@ -15,7 +16,6 @@ class Penjualan extends Model
         'user_id',
         'pelanggan_id',
         'no_nota',
-        'no_invoice',
     ];
 
     public function pelanggan(): BelongsTo
@@ -28,8 +28,13 @@ class Penjualan extends Model
         return $this->hasMany(DetailPenjualan::class);
     }
 
-    public function invoices(): HasMany
+    public function invoice(): HasOne
     {
-        return $this->hasMany(Invoice::class);
+        return $this->hasOne(Invoice::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
