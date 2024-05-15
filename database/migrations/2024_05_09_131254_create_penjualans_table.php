@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integerIncrements('id')->primary();
             $table->bigInteger('user_id')->unsigned();
             $table->integer('pelanggan_id')->unsigned();
-            $table->string('no_nota');
+            $table->string('no_nota')->unique();
 
             $table->foreign('user_id')->references('id')
                 ->on('users');
