@@ -2,24 +2,29 @@
 
 namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use App\Filament\Clusters\MasterBarang;
-use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
-use App\Models\MerekBarang;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\MerekBarang;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\MasterBarang;
+use Filament\Pages\SubNavigationPosition;
+use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
 
 class MerekBarangResource extends Resource
 {
     protected static ?string $cluster = MasterBarang::class;
-    
+
     protected static ?string $model = MerekBarang::class;
 
     protected static ?string $pluralModelLabel = 'Merek Barang';
 
     protected static ?string $navigationLabel = 'Merek Barang';
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    protected static ?string $slug = 'merek-barang';
 
     public static function form(Form $form): Form
     {

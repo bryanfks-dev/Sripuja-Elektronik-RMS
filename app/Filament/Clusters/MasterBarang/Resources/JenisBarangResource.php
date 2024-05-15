@@ -2,14 +2,14 @@
 
 namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use App\Filament\Clusters\MasterBarang;
-use App\Filament\Clusters\MasterBarang\Resources\JenisBarangResource\Pages;
-use App\Models\JenisBarang;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\JenisBarang;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\MasterBarang;
+use Filament\Pages\SubNavigationPosition;
+use App\Filament\Clusters\MasterBarang\Resources\JenisBarangResource\Pages;
 
 class JenisBarangResource extends Resource
 {
@@ -22,6 +22,10 @@ class JenisBarangResource extends Resource
     /* protected static ?string $navigationIcon = 'heroicon-c-square-3-stack-3d'; */
 
     protected static ?string $navigationLabel = 'Jenis Barang';
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    protected static ?string $slug = 'jenis-barang';
 
     public static function form(Form $form): Form
     {

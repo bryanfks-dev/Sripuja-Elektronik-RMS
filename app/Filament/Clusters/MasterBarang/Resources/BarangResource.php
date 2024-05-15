@@ -29,6 +29,8 @@ class BarangResource extends Resource
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
+    protected static ?string $slug = 'data-barang';
+
     public static function form(Form $form): Form
     {
         return $form
