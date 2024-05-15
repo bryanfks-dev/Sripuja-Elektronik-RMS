@@ -34,7 +34,8 @@ class MerekBarangResource extends Resource
         return $form
             ->schema([
                 TextInput::make('nama_merek')->label('Merek Barang')
-                    ->autocapitalize('characters')->required(),
+                    ->autocapitalize('characters')->unique()
+                    ->required(),
             ])->columns(1);
     }
 
