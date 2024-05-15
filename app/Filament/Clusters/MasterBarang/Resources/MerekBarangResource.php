@@ -2,13 +2,16 @@
 
 namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use Filament\Forms;
 use Filament\Tables;
+use App\Models\Barang;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\MerekBarang;
 use Filament\Resources\Resource;
 use App\Filament\Clusters\MasterBarang;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\SubNavigationPosition;
 use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
 
@@ -30,26 +33,36 @@ class MerekBarangResource extends Resource
     {
         return $form
             ->schema([
-                //
-            ]);
+                TextInput::make('nama_merek')->label('Merek Barang')
+                    ->autocapitalize('characters')->required(),
+            ])->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('nama_merek')->label('Merek Barang')
+                    ->searchable(),
+                TextColumn::make('jumlah')->label('Jumlah Barang')
+                    ->numeric()->default(0)
+                    ->getStateUsing(
+                        function(Model $model) {
+                            $sameMerek = Barang::where('merek_barang_id', '=', $model->id)
+                                ->count();
+
+                            return $sameMerek;
+                    })
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->color('white'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

@@ -37,7 +37,7 @@ class JenisBarangResource extends Resource
             ->schema([
                 TextInput::make('nama_jenis')->label('Jenis Barang')
                 ->autocapitalize('characters')->unique()->required(),
-            ]);
+            ])->columns(1);
     }
 
     public static function table(Table $table): Table
