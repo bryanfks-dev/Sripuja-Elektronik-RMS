@@ -9,4 +9,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateJenisBarang extends CreateRecord
 {
     protected static string $resource = JenisBarangResource::class;
+
+    protected ?string $heading = 'Tambah Jenis Barang';
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
 }

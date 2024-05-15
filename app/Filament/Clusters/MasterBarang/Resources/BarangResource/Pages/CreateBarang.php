@@ -10,7 +10,7 @@ class CreateBarang extends CreateRecord
 {
     protected static string $resource = BarangResource::class;
 
-    protected ?string $heading = 'Tambah Barang';
+    protected ?string $heading = 'Tambah Data Barang';
 
     protected function getRedirectUrl(): string
     {
