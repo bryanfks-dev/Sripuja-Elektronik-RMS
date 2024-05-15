@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('telepon')->nullable();
             $table->string('no_hp', 13);
             $table->integer('gaji')->unsigned();
+            $table->integer('gaji_bln_ini')->unsigned();
             $table->enum('tipe', ['Kasir','Non-Kasir'])
                 ->default('Non-Kasir');
 
