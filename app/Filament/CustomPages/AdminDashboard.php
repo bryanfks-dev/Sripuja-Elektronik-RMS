@@ -5,5 +5,5 @@ use Filament\Pages\Dashboard;
 
 class AdminDashboard extends Dashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-s-rectangle-group';
+    protected static ?string $navigationIcon = 'fas-home';
 }
