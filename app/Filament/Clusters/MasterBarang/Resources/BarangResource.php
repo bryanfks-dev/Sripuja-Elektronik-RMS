@@ -93,14 +93,14 @@ class BarangResource extends Resource
                 TextColumn::make('updated_at')->label('Update Terkahir')
                     ->date('d M Y'),
             ])
-            
+
             ->filters([
                 //
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()->color('white'),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()->label('Hapus'),
                 ])
             ])
             ->bulkActions([

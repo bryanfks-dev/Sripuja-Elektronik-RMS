@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Models\Nota;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables;
 use App\Models\Barang;
 use App\Models\Invoice;
@@ -18,11 +17,13 @@ use App\Models\DetailPenjualan;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PelangganResource;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
@@ -206,7 +207,7 @@ class PenjualanResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                MultiSelectFilter::make('user_id')->label('Username')
+                MultiSelectFilter::make('user_id')->label('Username Kasir')
                     ->relationship(
                         'user',
                         'username',
@@ -216,10 +217,26 @@ class PenjualanResource extends Resource
                             ->orWhere('karyawans.tipe', '=', 'Kasir')
                     )
                     ->preload()->searchable(),
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')->label('Periode Awal'),
+                        DatePicker::make('created_until')->label('Periode Akhir'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

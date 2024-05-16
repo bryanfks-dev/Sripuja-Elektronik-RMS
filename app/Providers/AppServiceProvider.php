@@ -2,13 +2,11 @@
 
 namespace App\Providers;
 
+use App\Filament\Widgets\DataPembelianChart;
+use App\Filament\Widgets\DataPenjualanChart;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use App\Filament\Widgets\BeliChart;
 use App\Filament\Widgets\LabaChart;
-use App\Filament\Widgets\LaporanLabaChart;
-use App\Filament\Widgets\LaporanPenjualanChart;
-use App\Filament\Widgets\LaporanPembelianChart;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,9 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-        Livewire::component('filament.widgets.test-chart', LaporanPenjualanChart::class);
-        Livewire::component('filament.widgets.beli-chart', LaporanPembelianChart::class);
-        Livewire::component('filament.widgets.laba-chart', LaporanLabaChart::class);
+        Livewire::component('filament.widgets.penjualan-chart', DataPenjualanChart::class);
+        Livewire::component('filament.widgets.pembelian-chart', DataPembelianChart::class);
+        Livewire::component('filament.widgets.laba-chart', LabaChart::class);
     }
 }

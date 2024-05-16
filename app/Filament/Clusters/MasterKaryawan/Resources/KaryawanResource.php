@@ -50,16 +50,14 @@ class KaryawanResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('tipe')->label('Pekerjaan')
-                ->options(self::$karyawanTypes)
+                    ->options(self::$karyawanTypes)
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

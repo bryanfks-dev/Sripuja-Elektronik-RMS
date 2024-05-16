@@ -3,13 +3,13 @@
 namespace App\Filament\Clusters\MasterKaryawan\Resources\AbsensiResource\Pages;
 
 use Exception;
-use Filament\Actions\StaticAction;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use App\Models\ConfigJson;
+use Illuminate\Support\Js;
 use Filament\Support\RawJs;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -25,7 +25,7 @@ class Config extends Page implements HasForms
 
     protected static string $view = 'filament.clusters.master-karyawan.resources.absensi-resource.pages.config';
 
-    protected ?string $heading = 'Konfigurasi';
+    protected ?string $heading = 'Pengaturan';
 
     public static array $json;
 
@@ -64,8 +64,8 @@ class Config extends Page implements HasForms
                 ->label('Simpan')
                 ->submit('save'),
             Action::make('cancel')
-                ->label(__('filament-panels::resources/pages/edit-record.form.actions.cancel.label'))
-                ->url($this->previousUrl ?? static::getResource()::getUrl())
+                ->label('Batalkan')
+                ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
                 ->color('gray')
         ];
     }

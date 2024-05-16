@@ -6,7 +6,9 @@ use App\Models\User;
 use Filament\Actions;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
+use Illuminate\Support\Js;
 use Filament\Support\RawJs;
+use Filament\Actions\Action;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
@@ -21,7 +23,7 @@ class EditKaryawan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->label('Hapus'),
         ];
     }
 
@@ -46,6 +48,9 @@ class EditKaryawan extends EditRecord
                         TextInput::make('gaji')->numeric()->prefix('Rp.')
                             ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
                             ->minValue(1)->required(),
+                        TextInput::make('gaji_bln_ini')->label('Gaji Bulan Ini')->numeric()->prefix('Rp.')
+                            ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
+                            ->minValue(1)->required(),
                     ])->columns(['md' => 2]),
                 Section::make('Akun Karyawan')
                     ->collapsed()
@@ -55,14 +60,31 @@ class EditKaryawan extends EditRecord
                             ->readOnly()->required(),
                         TextInput::make('password')->label('New Password')
                             ->password()->dehydrateStateUsing(
-                                fn ($state): string => ($state != null) ? Hash::make($state) : '')
+                                fn($state): string => ($state != null) ? Hash::make($state) : ''
+                            )
                             ->revealable(),
-                ])->columns(['md' => 2])
-                ->saveRelationshipsUsing(static function($component, Karyawan $record, $state) {
-                    if ($state['password'] != null) {
-                        User::find($state['id'])->update($state);
-                    }
-                })
+                    ])->columns(['md' => 2])
+                    ->saveRelationshipsUsing(static function ($component, Karyawan $record, $state) {
+                        if ($state['password'] != null) {
+                            User::find($state['id'])->update($state);
+                        }
+                    })
             ]);
+    }
+
+    protected function getSaveFormAction(): Action
+    {
+        return Action::make('save')
+            ->label('Simpan')
+            ->submit('save')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('Batalkan')
+            ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+            ->color('gray');
     }
 }
