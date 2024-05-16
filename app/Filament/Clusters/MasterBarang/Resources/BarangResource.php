@@ -93,6 +93,7 @@ class BarangResource extends Resource
                 TextColumn::make('updated_at')->label('Update Terkahir')
                     ->date('d M Y'),
             ])
+            
             ->filters([
                 //
             ])

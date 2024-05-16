@@ -57,6 +57,7 @@ class JenisBarangResource extends Resource
                         return $sameJenis;
                 }),
             ])
+            ->defaultSort('updated_at', 'desc')
             ->filters([
                 //
             ])

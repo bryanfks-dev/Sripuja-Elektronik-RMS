@@ -10,6 +10,11 @@ class Invoice extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'no_invoice',
+        'penjualan_id',
+    ];
+
     public static function generateNoInvoice(): string
     {
         $base = 'PB' . date('dmY') . '-';
@@ -26,7 +31,7 @@ class Invoice extends Model
         $todayLastInvoiceNum = explode('-', $lastInvoice[0]->no_invoice);
         $todayLastInvoiceNum = end($todayLastInvoiceNum);
 
-        return $base . str_pad(intval($todayLastInvoiceNum), 3,
+        return $base . str_pad((intval($todayLastInvoiceNum) + 1), 3,
             '0', STR_PAD_LEFT);
     }
 
