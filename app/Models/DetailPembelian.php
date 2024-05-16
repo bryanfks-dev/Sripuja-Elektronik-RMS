@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetailPembelian extends Model
 {
@@ -20,7 +20,15 @@ class DetailPembelian extends Model
 
     public $timestamps = false;
 
-    public function penjualans(): BelongsToMany {
-        return $this->belongsToMany(Penjualan::class);
+
+
+    public function pembelian(): BelongsTo
+    {
+        return $this->belongsTo(Penjualan::class);
+    }
+
+    public function barang(): BelongsTo
+    {
+        return $this->belongsTo(Barang::class);
     }
 }

@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('pembelians', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
             $table->integer('supplier_id')->unsigned();
-            $table->string('no_nota');
-            $table->timestamp('tanggal_waktu')->default(now());
-            $table->date('tanggal_jatuh_tempo');
+            $table->string('no_nota')->unique();
+            $table->string('no_faktur')->unique();
+            $table->date('jatuh_tempo');
             $table->enum('status', ['Belum Lunas','Lunas'])
                 ->default('Belum Lunas');
 
             $table->foreign('supplier_id')->references('id')
                 ->on('suppliers');
+
+            $table->timestamps();
         });
     }
 

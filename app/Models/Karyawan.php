@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\KaryawanType;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +20,12 @@ class Karyawan extends Model
         'telepon',
         'no_hp',
         'gaji',
+        'gaji_bln_ini',
         'tipe',
+    ];
+
+    protected $casts = [
+        'tipe' => KaryawanType::class,
     ];
 
     public $timestamps = false;
@@ -36,14 +43,15 @@ class Karyawan extends Model
         }
 
         // Get exact username from user table
-        $users = User::where
-            ('username', 'REGEXP', "^$username\d*")->get();
+        $user = User::where
+            ('username', 'REGEXP', "^$username\d*")->latest()
+            ->get('username');
 
         // Check alike username found
-        if (!$users->isEmpty()) {
+        if (!$user->isEmpty()) {
             // Get highest number from username
             $found = preg_match('/\d/',
-                $users->last()->username, $num);
+                $user[0], $num);
 
             if ($found) {
                 // Append number to username
@@ -58,12 +66,17 @@ class Karyawan extends Model
         return $username;
     }
 
-    public static function createPassword($phoneNum)
+    public static function createPassword($password)
     {
-        return Hash::make($phoneNum);
+        return Hash::make($password);
     }
 
-    public function user(): HasOne {
-        return $this->hasOne(User::class);
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
+    }
+
+    public function absensis(): HasOne
+    {
+        return $this->hasOne(Absensi::class);
     }
 }

@@ -2,23 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
+use App\Models\DetailPenjualan;
+use App\Models\Penjualan;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Pelanggan;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PelangganResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PelangganResource\RelationManagers;
 
 class PelangganResource extends Resource
 {
     protected static ?string $model = Pelanggan::class;
+
+    protected static ?string $pluralModelLabel = 'Data Pelanggan';
+
+    protected static ?string $slug = 'relasi/pelanggan';
 
     protected static ?string $navigationGroup = 'Relasi';
 
@@ -33,13 +34,13 @@ class PelangganResource extends Resource
         return $form
             ->schema([
                 TextInput::make('nama_lengkap')->label('Nama Lengkap')
-                    ->autocapitalize()->required(),
-                TextInput::make('alamat')->autocapitalize(),
+                    ->autocapitalize('words')->required(),
+                TextInput::make('alamat')->autocapitalize('sentences')
+                    ->autocapitalize(),
                 TextInput::make('telepon')->tel()
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
                 TextInput::make('no_hp')->label('Nomor Hp')->tel()
-                    ->prefix('+62')->maxLength(12)
-                    ->telRegex('/^8[1-9][0-9]{6,10}$/'),
+                    ->maxLength(13)->telRegex('/^08[1-9][0-9]{6,10}$/'),
                 TextInput::make('fax')->tel()
                     ->telRegex('/^[(]?[0-9]{1,4}[)]?[0-9]+$/'),
             ]);
@@ -57,7 +58,26 @@ class PelangganResource extends Resource
                     ->placeholder('-'),
                 TextColumn::make('fax')->placeholder('-'),
                 TextColumn::make('total_pembelian')->label('Total Pembelian')
-                    ->money('Rp ')->placeholder('-')->sortable(),
+                    ->money('Rp ')->default(0)
+                    ->getStateUsing(
+                        function (Pelanggan $model) {
+                            $pelangganId = $model->id;
+
+                            $penjualans =
+                                Penjualan::where('pelanggan_id', '=', $pelangganId)
+                                    ->get('id');
+
+                            $sum = 0;
+
+                            for ($i = 0; $i < count($penjualans); $i++) {
+                                $sum += DetailPenjualan::where('penjualan_id', $penjualans[$i]->id)
+                                    ->sum('sub_total');
+                            }
+
+                            return $sum;
+                        }
+                    )
+                    ->sortable(),
             ])
             ->filters([
                 //

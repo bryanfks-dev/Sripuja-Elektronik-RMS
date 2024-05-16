@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Absensi extends Model
 {
@@ -19,7 +19,8 @@ class Absensi extends Model
     public $timestamps = false;
 
 
-    public function karyawan(): HasMany {
-        return $this->hasMany(Karyawan::class);
+    public function karyawans(): BelongsToMany
+    {
+        return $this->belongsToMany(Karyawan::class);
     }
 }
