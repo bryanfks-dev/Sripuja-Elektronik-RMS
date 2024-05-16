@@ -64,6 +64,6 @@ Schedule::call(function () {
 
         throw $exception;
     }
-})->dailyAt('23:30')->timezone('Asia/Jakarta')->when(
+})->dailyAt('23:30')->when(
     fn () => ConfigJson::loadJson()['otomasi']
 );
