@@ -5,7 +5,9 @@ namespace App\Filament\Clusters\MasterKaryawan\Resources\KaryawanResource\Pages;
 use App\Models\User;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
+use Illuminate\Support\Js;
 use Filament\Support\RawJs;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\CreateRecord;
@@ -58,5 +60,30 @@ class CreateKaryawan extends CreateRecord
                     ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
                     ->minValue(1)->required(),
             ]);
+    }
+
+    protected function getCreateFormAction(): Action
+    {
+        return Action::make('create')
+            ->label('Tambah')
+            ->submit('create')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCreateAnotherFormAction(): Action
+    {
+        return Action::make('createAnother')
+            ->label('Tambah Lagi')
+            ->action('createAnother')
+            ->keyBindings(['mod+shift+s'])
+            ->color('gray');
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('Batal')
+            ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+            ->color('gray');
     }
 }

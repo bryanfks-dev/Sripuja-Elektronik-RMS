@@ -2,14 +2,12 @@
 
 namespace App\Filament\Resources\PenjualanResource\Pages;
 
-use App\Filament\Resources\PenjualanResource;
-use App\Models\Barang;
 use App\Models\Invoice;
 use App\Models\Penjualan;
-use Filament\Actions;
+use Illuminate\Support\Js;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Redirect;
-use Route;
+use App\Filament\Resources\PenjualanResource;
 
 class CreatePenjualan extends CreateRecord
 {
@@ -47,5 +45,30 @@ class CreatePenjualan extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return static::getResource()::getUrl('index');
+    }
+
+    protected function getCreateFormAction(): Action
+    {
+        return Action::make('create')
+            ->label('Tambah')
+            ->submit('create')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCreateAnotherFormAction(): Action
+    {
+        return Action::make('createAnother')
+            ->label('Tambah Lagi')
+            ->action('createAnother')
+            ->keyBindings(['mod+shift+s'])
+            ->color('gray');
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('Batal')
+            ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+            ->color('gray');
     }
 }
