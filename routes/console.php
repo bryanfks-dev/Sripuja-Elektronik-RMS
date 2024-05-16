@@ -48,7 +48,8 @@ Schedule::call(function () {
         // Subtract Rp 50_000 from karyawans
         DB::table('karyawans')->whereIn('id', $notPresents)
         ->update([
-            'gaji_bln_ini' => DB::raw('CASE WHEN `gaji_bln_ini` > 50000 `gaji_bln_ini` - 50000'),
+            'gaji_bln_ini' => DB::raw('CASE WHEN `gaji_bln_ini` > 50000 THEN
+                (`gaji_bln_ini` - 50000) ELSE `gaji_bln_ini` END'),
         ]);
 
         DB::commit();
@@ -63,5 +64,6 @@ Schedule::call(function () {
 
         throw $exception;
     }
-})->dailyAt('23:30');
-
+})->dailyAt('23:30')->timezone('Asia/Jakarta')->when(
+    fn () => ConfigJson::loadJson()['otomasi']
+);

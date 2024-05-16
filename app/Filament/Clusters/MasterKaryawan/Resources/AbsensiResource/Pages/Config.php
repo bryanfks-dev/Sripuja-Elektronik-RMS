@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\MasterKaryawan\Resources\AbsensiResource\Pages;
 
 use Exception;
 use Filament\Actions\StaticAction;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use App\Models\ConfigJson;
 use Filament\Support\RawJs;
@@ -48,10 +49,10 @@ class Config extends Page implements HasForms
                     ->format('H:i')->displayFormat('H:i')->required(),
                 TextInput::make('jumlah_potongan')->label('Jumlah Potongan')->prefix('Rp ')
                     ->numeric()->mask(RawJs::make('$money($input)'))->stripCharacters(',')
-                    ->minValue(1)->default(function () {
-                        return self::$json['jumlah_potongan'];
-                    })
+                    ->minValue(1)->default(fn () => self::$json['jumlah_potongan'])
                     ->required(),
+                Toggle::make('otomasi')->label('Otomasi Pengurangan Gaji Karyawan')
+                    ->default(fn () => self::$json['otomasi'])->inline(false)
             ])
             ->statePath('data');
     }
@@ -79,6 +80,7 @@ class Config extends Page implements HasForms
                 strtotime($data['waktu_masuk'])
             );
             self::$json['jumlah_potongan'] = intval($data['jumlah_potongan']);
+            self::$json['otomasi'] = $data['otomasi'];
 
             // Save to json
             ConfigJson::modifyJson(self::$json);
@@ -88,6 +90,8 @@ class Config extends Page implements HasForms
                 ->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))
                 ->send();
         }
-        catch (Exception $e) {}
+        catch (Exception $e) {
+            throw $e;
+        }
     }
 }

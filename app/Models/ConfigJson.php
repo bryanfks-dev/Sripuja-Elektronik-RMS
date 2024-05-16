@@ -8,7 +8,11 @@ class ConfigJson
 {
     private static string $jsonPath = 'json/config.json';
 
-    private static string $jsonTemplate = "{ \"waktu_masuk\": \"12:00\", \"jumlah_potongan\": 50000 }";
+    private static string $jsonTemplate = "{
+        \"waktu_masuk\": \"12:00\",
+        \"jumlah_potongan\": 50000,
+        \"otomasi\": true 
+    }";
 
     private static function generateIfnotExists()
     {
