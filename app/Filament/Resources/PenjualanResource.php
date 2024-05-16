@@ -2,23 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Invoice;
 use App\Models\Nota;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables;
 use App\Models\Barang;
+use App\Models\Invoice;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\Penjualan;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
+use App\Models\DetailPenjualan;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Filament\Support\Colors\Color;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use App\Filament\Resources\PelangganResource;
+use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
 
@@ -52,8 +58,8 @@ class PenjualanResource extends Resource
                             ->autocapitalize('characters')
                             ->formatStateUsing(fn() => Invoice::generateNoInvoice())
                             ->readOnly(),
-                        TextInput::make('tanggal')->default(date('d-m-Y'))
-                            ->dehydrated(false)->readOnly(),
+                        DatePicker::make('created_at')->label('Tanggal')
+                            ->default(now())->dehydrated(false)->readOnly(),
                         Select::make('pelanggan_id')->label('Nama Pelanggan')
                             ->relationship('pelanggan', 'nama_lengkap')
                             ->createOptionForm(
@@ -80,38 +86,34 @@ class PenjualanResource extends Resource
                             ->schema([
                                 Select::make('barang_id')->relationship('barang', 'nama_barang')
                                     ->native(false)->preload()->searchable()
-                                    ->afterStateUpdated(
+                                    ->live()->afterStateUpdated(
                                         function (Get $get, Set $set) {
                                             self::updateDatasPrimary($get, $set);
                                         }
                                     )
-                                    ->live()->required(),
+                                    ->required(),
                                 TextInput::make('jumlah')->numeric()->minValue(1)
                                     ->default(1)->maxValue(function (Get $get) {
-                                        $barangId = $get('barang_id');
-
-                                        if (!empty ($barangId)) {
-                                            return Barang::find($get('barang_id'))->stock;
+                                        if (!empty ($barangId = $get('barang_id'))) {
+                                            return Barang::find($barangId)->stock;
                                         }
-
-                                        return null;
-                                    })
+                                    })->live()
                                     ->afterStateUpdated(
                                         function (Get $get, Set $set) {
                                             self::updateDatasSecondary($get, $set);
                                         }
                                     )
-                                    ->live()->required(),
+                                    ->required(),
                                 TextInput::make('harga_jual')->prefix('Rp ')
                                     ->numeric()->default(0)->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')
-                                    ->afterStateUpdated(
+                                    ->live()->afterStateUpdated(
                                         function (Get $get, Set $set) {
                                             self::updateDatasSecondary($get, $set);
                                         }
                                     )
                                     ->disabled(fn(Get $get) => ($get('barang_id') == null))
-                                    ->live()->required(),
+                                    ->required(),
                                 TextInput::make('sub_total')->prefix('Rp ')
                                     ->numeric()->default(0)->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')->readOnly(),
@@ -162,11 +164,13 @@ class PenjualanResource extends Resource
             $barang = Barang::find($barangId);
             $jumlah = intval($get('jumlah'));
 
-            $set('sub_total', self::getSubTotal(
-                $jumlah,
-                $barang,
-                $get('harga_jual')
-            )
+            $set(
+                'sub_total',
+                self::getSubTotal(
+                    $jumlah,
+                    $barang,
+                    intval(str_replace(',', '', $get('harga_jual')))
+                )
             );
         }
     }
@@ -175,19 +179,43 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
-                    ->searchable(),
                 TextColumn::make('no_nota')->label('Nomor Nota')
                     ->searchable(),
+                TextColumn::make('invoice.no_invoice')->label('Nomor Invoice')
+                    ->searchable(),
+                TextColumn::make('created_at')->label('Tanggal Penjualan')
+                    ->date('d M Y')->sortable(),
+                TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
+                    ->searchable(),
                 TextColumn::make('total_pembelian')->label('Total Pembelian')
-                    ->money('id')->placeholder('-')
+                    ->money('Rp ')->default(0)->placeholder('-')
                     ->getStateUsing(function (Penjualan $model) {
-                        $pelangganId = $model->pelanggan()->first()->id;
+                        $detailPenjualans =
+                            DetailPenjualan::where('penjualan_id', '=', $model->id)
+                                ->sum('sub_total');
+
+                        return $detailPenjualans;
                     })->sortable(),
+                TextColumn::make('user.username')->label('Kasir')
+                    ->color(
+                        function (Penjualan $model) {
+                            return (User::find($model->user_id)->email != null) ?
+                                Color::Green : Color::Amber;
+                        }
+                    ),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                MultiSelectFilter::make('user_id')->label('Username')
+                    ->relationship(
+                        'user',
+                        'username',
+                        fn(Builder $query) => $query
+                            ->join('karyawans', 'users.id', '=', 'karyawans.user_id', 'left')
+                            ->where('email', '<>', 'NULL')
+                            ->orWhere('karyawans.tipe', '=', 'Kasir')
+                    )
+                    ->preload()->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),

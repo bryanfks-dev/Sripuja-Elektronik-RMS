@@ -20,7 +20,7 @@ class Nota
         $todayLastNotaNum = explode('/', $lastNota[0]->no_nota);
         $todayLastNotaNum = end($todayLastNotaNum);
 
-        return $base . str_pad(intval($todayLastNotaNum), 3,
+        return $base . str_pad((intval($todayLastNotaNum) + 1), 3,
             '0', STR_PAD_LEFT);
     }
 
@@ -40,7 +40,7 @@ class Nota
         $todayLastNotaNum = explode('/', $lastNota[0]->no_nota);
         $todayLastNotaNum = end($todayLastNotaNum);
 
-        return $base . str_pad(intval($todayLastNotaNum), 3,
+        return $base . str_pad((intval($todayLastNotaNum) + 1), 3,
             '0', STR_PAD_LEFT);
     }
 }

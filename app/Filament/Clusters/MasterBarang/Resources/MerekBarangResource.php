@@ -55,6 +55,7 @@ class MerekBarangResource extends Resource
                             return $sameMerek;
                     })
             ])
+            ->defaultSort('updated_at', 'desc')
             ->filters([
                 //
             ])

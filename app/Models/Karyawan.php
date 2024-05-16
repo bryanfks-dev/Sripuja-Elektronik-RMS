@@ -20,6 +20,7 @@ class Karyawan extends Model
         'telepon',
         'no_hp',
         'gaji',
+        'gaji_bln_ini',
         'tipe',
     ];
 
@@ -65,9 +66,9 @@ class Karyawan extends Model
         return $username;
     }
 
-    public static function createPassword($phoneNum)
+    public static function createPassword($password)
     {
-        return Hash::make($phoneNum);
+        return Hash::make($password);
     }
 
     public function user(): BelongsTo {

@@ -69,12 +69,12 @@ class SupplierResource extends Resource
                     ->getStateUsing(function (Supplier $model) {
                         $supplierId = $model->id;
 
-                        $pembelian =
+                        $pembelians =
                             Pembelian::where('supplier_id', '=', $supplierId)
                                 ->latest()->get('created_at');
 
-                        if (!$pembelian->isEmpty()) {
-                            return $pembelian[0]->created_at;
+                        if (!$pembelians->isEmpty()) {
+                            return $pembelians[0]->created_at;
                         }
                     })
                     ->sortable(),

@@ -61,8 +61,8 @@ class PembelianResource extends Resource
                             ->autocapitalize('characters')->required(),
                         DatePicker::make('jatuh_tempo')->label('Jatuh Tempo')
                             ->required(),
-                        TextInput::make('tanggal')->default(date('d-m-Y'))
-                            ->dehydrated(false)->readOnly(),
+                        DatePicker::make('created_at')->label('Tanggal')
+                            ->default(now())->dehydrated(false)->readOnly(),
                         Select::make('supplier_id')->label('Nama Supplier')
                             ->relationship('supplier', 'nama')
                             ->searchable()->preload()->native(false)
@@ -72,7 +72,8 @@ class PembelianResource extends Resource
                             )
                             ->required(),
                         Select::make('status')->label('Status Pembayaran')
-                            ->options(self::$statues)->default('Belum Lunas')->required()
+                            ->native(false)->options(self::$statues)
+                            ->default('Belum Lunas')->required()
                     ])
                     ->columns(['md' => 2]),
                 Section::make('Detail Pembelian')
@@ -99,7 +100,7 @@ class PembelianResource extends Resource
                                             self::updateDatas($get, $set);
                                         }
                                     )
-                                    ->required(),
+                                    ->native(false)->required(),
                                 TextInput::make('jumlah')->numeric()->default(1)
                                     ->minValue(1)->live()->afterStateUpdated(
                                         function (Get $get, Set $set) {
