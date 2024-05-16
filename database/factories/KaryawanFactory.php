@@ -32,6 +32,7 @@ class KaryawanFactory extends Factory
             'telepon' => $this->faker->phoneNumber(),
 
             'gaji' => $this->faker->numberBetween(10000, 100000),
+            'gaji_bln_ini' => $this->faker->numberBetween(10000, 100000),
             'tipe' => $this->faker->randomElement(['Kasir', 'Non-Kasir']),
 
         ];

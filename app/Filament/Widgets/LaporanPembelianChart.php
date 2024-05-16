@@ -36,7 +36,6 @@ class LaporanPembelianChart extends ChartWidget
 
         if ($activeFilter == 'year') {
             $data1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
             ->between(
                     start: $startOfYear,
                     end: $endOfYear,
@@ -47,7 +46,7 @@ class LaporanPembelianChart extends ChartWidget
 
 
             $data2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
+
                 ->between(
                     start: Carbon::now()->subYear()->startOfYear(),
                     end: Carbon::now()->subYear()->endOfYear(),
@@ -64,7 +63,7 @@ class LaporanPembelianChart extends ChartWidget
             $label2 = Carbon::now()->subYear()->year;
         } elseif ($activeFilter == 'month') {
             $data1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
+
                 ->between(
                     start: Carbon::now()->startOfMonth(),
                     end: Carbon::now()->endOfMonth(),
@@ -72,7 +71,7 @@ class LaporanPembelianChart extends ChartWidget
                 ->perDay()
                 ->sum('sub_total');
             $data2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
+
                 ->between(
                     start: Carbon::now()->subMonth()->startOfMonth(),
                     end: Carbon::now()->subMonth()->endOfMonth(),
@@ -89,7 +88,6 @@ class LaporanPembelianChart extends ChartWidget
             $label2 = $date->subMonth()->format('F');
         } elseif ($activeFilter == 'week') {
             $data1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->startOfWeek(),
                     end: Carbon::now()->endOfWeek(),
@@ -97,7 +95,6 @@ class LaporanPembelianChart extends ChartWidget
                 ->perDay()
                 ->sum('sub_total');
             $data2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->subWeek()->startOfWeek(),
                     end: Carbon::now()->subWeek()->endOfWeek(),
@@ -114,7 +111,6 @@ class LaporanPembelianChart extends ChartWidget
             $label2 = "Minggu Lalu";
         } elseif ($activeFilter == 'today') {
             $data1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->startOfDay(),
                     end: Carbon::now()->endOfDay(),
@@ -122,7 +118,6 @@ class LaporanPembelianChart extends ChartWidget
                 ->perHour()
                 ->sum('sub_total');
             $data2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->subDay()->startOfDay(),
                     end: Carbon::now()->subDay()->endOfDay(),
@@ -140,7 +135,6 @@ class LaporanPembelianChart extends ChartWidget
 
         } elseif ($activeFilter == 'last_year') {
             $data1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->subYear()->startOfYear(),
                     end: Carbon::now()->subYear()->endOfYear(),
@@ -149,7 +143,6 @@ class LaporanPembelianChart extends ChartWidget
                 ->sum('sub_total');
 
             $data2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-            ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->subYears(2)->startOfYear(),
                     end: Carbon::now()->subYears(2)->endOfYear(),

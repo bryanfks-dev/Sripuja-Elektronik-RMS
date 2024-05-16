@@ -57,7 +57,6 @@ class LaporanLabaChart extends ChartWidget
                 ->sum('sub_total');
 
                 $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                         start: $startOfYear,
                         end: $endOfYear,
@@ -68,7 +67,7 @@ class LaporanLabaChart extends ChartWidget
 
 
                 $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                    ->dateColumn('pembelians.tanggal_waktu')
+
                     ->between(
                         start: Carbon::now()->subYear()->startOfYear(),
                         end: Carbon::now()->subYear()->endOfYear(),
@@ -102,7 +101,6 @@ class LaporanLabaChart extends ChartWidget
                 ->sum('sub_total');
 
                 $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->startOfMonth(),
                     end: Carbon::now()->endOfMonth(),
@@ -110,7 +108,6 @@ class LaporanLabaChart extends ChartWidget
                 ->perDay()
                 ->sum('sub_total');
             $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                 ->between(
                     start: Carbon::now()->subMonth()->startOfMonth(),
                     end: Carbon::now()->subMonth()->endOfMonth(),
@@ -145,7 +142,6 @@ class LaporanLabaChart extends ChartWidget
                 ->sum('sub_total');
 
                 $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                     ->between(
                         start: Carbon::now()->startOfWeek(),
                         end: Carbon::now()->endOfWeek(),
@@ -153,7 +149,6 @@ class LaporanLabaChart extends ChartWidget
                     ->perDay()
                     ->sum('sub_total');
                 $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                     ->between(
                         start: Carbon::now()->subWeek()->startOfWeek(),
                         end: Carbon::now()->subWeek()->endOfWeek(),
@@ -187,7 +182,6 @@ class LaporanLabaChart extends ChartWidget
                 ->sum('sub_total');
 
                 $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                     ->between(
                         start: Carbon::now()->startOfDay(),
                         end: Carbon::now()->endOfDay(),
@@ -195,7 +189,6 @@ class LaporanLabaChart extends ChartWidget
                     ->perHour()
                     ->sum('sub_total');
                 $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
-                ->dateColumn('pembelians.tanggal_waktu')
                     ->between(
                         start: Carbon::now()->subDay()->startOfDay(),
                         end: Carbon::now()->subDay()->endOfDay(),
@@ -203,13 +196,13 @@ class LaporanLabaChart extends ChartWidget
                     ->perHour()
                     ->sum('sub_total');
 
+
+            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
             $total1 = $laba1->sum(fn ($value) => $value);
             $total1Formatted = number_format($total1, 0, '.', '.');
             $total2 = $laba2->sum(fn ($value) => $value);
             $total2Formatted = number_format($total2, 0, '.', '.');
-            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
-            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
-
             $label1 = "Hari Ini";
             $label2 = "Hari Lalu";
         }

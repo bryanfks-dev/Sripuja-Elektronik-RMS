@@ -20,8 +20,9 @@ class PembelianFactory extends Factory
             //
             'supplier_id' => $this->faker->numberBetween(1, 10),
             'no_nota' => $this->faker->numberBetween(100000, 999999),
-            'tanggal_waktu' => $this->faker->dateTimeBetween('-2 years', 'now'),
-            'tanggal_jatuh_tempo' =>$this->faker->dateTimeBetween('now', '+2 months'),
+            'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
+            'jatuh_tempo' =>$this->faker->dateTimeBetween('now', '+2 months'),
+            'no_faktur' => $this->faker->numberBetween(100000, 999999),
             'status' => $this->faker->randomElement(['Lunas', 'Belum Lunas']),
         ];
     }

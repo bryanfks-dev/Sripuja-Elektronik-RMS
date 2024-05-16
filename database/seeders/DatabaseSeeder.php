@@ -8,7 +8,9 @@ use App\Models\User;
 use App\Models\Barang;
 use App\Models\DetailPembelian;
 use App\Models\DetailPenjualan;
+use App\Models\JenisBarang;
 use App\Models\Karyawan;
+use App\Models\MerekBarang;
 use App\Models\Pelanggan;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
@@ -29,6 +31,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => bcrypt('1234'),
         ]);
+
+        MerekBarang::factory(10)->create();
+
+        JenisBarang::factory(10)->create();
 
         Barang::factory(25)->create();
 
