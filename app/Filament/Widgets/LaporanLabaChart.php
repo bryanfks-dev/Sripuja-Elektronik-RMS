@@ -2,16 +2,16 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DetailPenjualan;
+use App\Models\Pembelian;
 use App\Models\Penjualan;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
-class LaporanPenjualanChart extends ChartWidget
+class LaporanLabaChart extends ChartWidget
 {
-    protected static ?string $heading = 'Grafik Laporan Penjualan';
+    protected static ?string $heading = 'Grafik Laba';
 
     public ?string $filter = 'year';
 
@@ -21,6 +21,7 @@ class LaporanPenjualanChart extends ChartWidget
     protected int | string | array $columnSpan = 'full';
 
     protected string $activeFilter;
+    protected string $label;
 
     protected function getData(): array
     {
@@ -31,8 +32,10 @@ class LaporanPenjualanChart extends ChartWidget
 
         $jual1 = collect();
         $jual2 = collect();
-        $total1 = 0;
-
+        $beli1 = collect();
+        $beli2 = collect();
+        $laba1 = collect();
+        $laba2 = collect();
 
         if ($activeFilter == 'year') {
             $jual1 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
@@ -53,21 +56,43 @@ class LaporanPenjualanChart extends ChartWidget
                 ->perMonth()
                 ->sum('sub_total');
 
-            $total1 = $jual1->sum(fn (TrendValue $value) => $value->aggregate);
-            $total1Formatted = number_format($total1, 0, '.', '.');
-            $total2 = $jual2->sum(fn (TrendValue $value) => $value->aggregate);
-            $total2Formatted = number_format($total2, 0, '.', '.');
+                $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                ->between(
+                        start: $startOfYear,
+                        end: $endOfYear,
+                    )
+                    ->perMonth()
+                    ->sum('sub_total');
 
+
+
+                $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                    ->dateColumn('pembelians.tanggal_waktu')
+                    ->between(
+                        start: Carbon::now()->subYear()->startOfYear(),
+                        end: Carbon::now()->subYear()->endOfYear(),
+                    )
+                    ->perMonth()
+                    ->sum('sub_total');
+
+            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+
+            $total1 = $laba1->sum(fn ($value) => $value);
+            $total1Formatted = number_format($total1, 0, '.', '.');
+            $total2 = $laba2->sum(fn ($value) => $value);
+            $total2Formatted = number_format($total2, 0, '.', '.');
             $label1 = Carbon::now()->year;
             $label2 = Carbon::now()->subYear()->year;
         } elseif ($activeFilter == 'month') {
             $jual1 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
-                ->between(
-                    start: Carbon::now()->startOfMonth(),
-                    end: Carbon::now()->endOfMonth(),
-                )
-                ->perDay()
-                ->sum('sub_total');
+            ->between(
+                start: Carbon::now()->startOfMonth(),
+                end: Carbon::now()->endOfMonth(),
+            )
+            ->perDay()
+            ->sum('sub_total');
             $jual2 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
                 ->between(
                     start: Carbon::now()->subMonth()->startOfMonth(),
@@ -76,14 +101,34 @@ class LaporanPenjualanChart extends ChartWidget
                 ->perDay()
                 ->sum('sub_total');
 
-            $total1 = $jual1->sum(fn (TrendValue $value) => $value->aggregate);
-            $total1Formatted = number_format($total1, 0, '.', '.');
-            $total2 = $jual2->sum(fn (TrendValue $value) => $value->aggregate);
-            $total2Formatted = number_format($total2, 0, '.', '.');
+                $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                ->between(
+                    start: Carbon::now()->startOfMonth(),
+                    end: Carbon::now()->endOfMonth(),
+                )
+                ->perDay()
+                ->sum('sub_total');
+            $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                ->between(
+                    start: Carbon::now()->subMonth()->startOfMonth(),
+                    end: Carbon::now()->subMonth()->endOfMonth(),
+                )
+                ->perDay()
+                ->sum('sub_total');
 
+            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+
+            $total1 = $laba1->sum(fn ($value) => $value);
+            $total1Formatted = number_format($total1, 0, '.', '.');
+            $total2 = $laba2->sum(fn ($value) => $value);
+            $total2Formatted = number_format($total2, 0, '.', '.');
             $label1 = $date->format('F');
             $label2 = $date->subMonth()->format('F');
         } elseif ($activeFilter == 'week') {
+
             $jual1 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
                 ->between(
                     start: Carbon::now()->startOfWeek(),
@@ -99,11 +144,30 @@ class LaporanPenjualanChart extends ChartWidget
                 ->perDay()
                 ->sum('sub_total');
 
-            $total1 = $jual1->sum(fn (TrendValue $value) => $value->aggregate);
-            $total1Formatted = number_format($total1, 0, '.', '.');
-            $total2 = $jual2->sum(fn (TrendValue $value) => $value->aggregate);
-            $total2Formatted = number_format($total2, 0, '.', '.');
+                $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                    ->between(
+                        start: Carbon::now()->startOfWeek(),
+                        end: Carbon::now()->endOfWeek(),
+                    )
+                    ->perDay()
+                    ->sum('sub_total');
+                $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                    ->between(
+                        start: Carbon::now()->subWeek()->startOfWeek(),
+                        end: Carbon::now()->subWeek()->endOfWeek(),
+                    )
+                    ->perDay()
+                    ->sum('sub_total');
 
+            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+
+            $total1 = $laba1->sum(fn ($value) => $value);
+            $total1Formatted = number_format($total1, 0, '.', '.');
+            $total2 = $laba2->sum(fn ($value) => $value);
+            $total2Formatted = number_format($total2, 0, '.', '.');
             $label1 = "Minggu Ini";
             $label2 = "Minggu Lalu";
         } elseif ($activeFilter == 'today') {
@@ -122,46 +186,39 @@ class LaporanPenjualanChart extends ChartWidget
                 ->perHour()
                 ->sum('sub_total');
 
-            $total1 = $jual1->sum(fn (TrendValue $value) => $value->aggregate);
+                $beli1 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                    ->between(
+                        start: Carbon::now()->startOfDay(),
+                        end: Carbon::now()->endOfDay(),
+                    )
+                    ->perHour()
+                    ->sum('sub_total');
+                $beli2 = Trend::query(Pembelian::join('detail_pembelians', 'detail_pembelians.pembelian_id', '=', 'pembelians.id'))
+                ->dateColumn('pembelians.tanggal_waktu')
+                    ->between(
+                        start: Carbon::now()->subDay()->startOfDay(),
+                        end: Carbon::now()->subDay()->endOfDay(),
+                    )
+                    ->perHour()
+                    ->sum('sub_total');
+
+            $total1 = $laba1->sum(fn ($value) => $value);
             $total1Formatted = number_format($total1, 0, '.', '.');
-            $total2 = $jual2->sum(fn (TrendValue $value) => $value->aggregate);
+            $total2 = $laba2->sum(fn ($value) => $value);
             $total2Formatted = number_format($total2, 0, '.', '.');
+            $laba1 = $jual1->zip($beli1)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
+            $laba2 = $jual2->zip($beli2)->map(fn ($values) => $values[0]->aggregate - $values[1]->aggregate);
 
             $label1 = "Hari Ini";
             $label2 = "Hari Lalu";
-
-        } elseif ($activeFilter == 'last_year') {
-            $jual1 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
-                ->between(
-                    start: Carbon::now()->subYear()->startOfYear(),
-                    end: Carbon::now()->subYear()->endOfYear(),
-                )
-                ->perMonth()
-                ->sum('sub_total');
-
-            $jual2 = Trend::query(Penjualan::join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id'))
-                ->between(
-                    start: Carbon::now()->subYears(2)->startOfYear(),
-                    end: Carbon::now()->subYears(2)->endOfYear(),
-                )
-                ->perMonth()
-                ->sum('sub_total');
-
-            $total1 = $jual1->sum(fn (TrendValue $value) => $value->aggregate);
-            $total1Formatted = number_format($total1, 0, '.', '.');
-            $total2 = $jual2->sum(fn (TrendValue $value) => $value->aggregate);
-            $total2Formatted = number_format($total2, 0, '.', '.');
-
-            $label1 = Carbon::now()->subYear()->year;
-            $label2 = Carbon::now()->subYears(2)->year;
         }
-
 
         return [
             'datasets' => [
                 [
                     'label' => $label1 . ' ( Rp. ' . $total1Formatted . ' )',
-                    'data' => $jual1->map(fn (TrendValue $value) => $value->aggregate),
+                    'data' => $laba1,
                     'borderColor' => 'rgb(244, 63, 94)',
                     'backgroundColor' => 'rgb(244, 63, 94)',
                     'hoverBackgroundColor' => 'rgb(244, 63, 94)',
@@ -172,7 +229,7 @@ class LaporanPenjualanChart extends ChartWidget
                 ],
                 [
                     'label' => $label2 . ' ( Rp. ' . $total2Formatted . ' )',
-                    'data' => $jual2->map(fn (TrendValue $value) => $value->aggregate),
+                    'data' => $laba2,
                     'borderColor' => 'rgb(64, 32, 65)',
                     'backgroundColor' => 'rgb(64, 32, 65)',
                     'hoverBackgroundColor' => 'rgb(64, 32, 65)',
@@ -184,7 +241,7 @@ class LaporanPenjualanChart extends ChartWidget
             ],
             'labels' => $jual1->map(function (TrendValue $value) use ($activeFilter) {
                 // Adjust date format based on the expected format from Trend
-                if ($activeFilter == 'year' || $activeFilter == 'last_year') {
+                if ($activeFilter == 'year') {
                     $date = Carbon::createFromFormat('Y-m', $value->date);
                     return $date->format('M');
                 } elseif ($activeFilter == 'month' || $activeFilter == 'week') {
@@ -210,9 +267,6 @@ class LaporanPenjualanChart extends ChartWidget
             'week' => 'Minggu',
             'month' => 'Bulan',
             'year' => 'Tahun',
-            'last_year' => 'Tahun Lalu',
         ];
     }
-
-
 }

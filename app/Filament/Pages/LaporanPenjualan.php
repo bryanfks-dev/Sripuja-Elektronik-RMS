@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\LaporanLabaChart;
+use App\Filament\Widgets\LaporanPembelianChart;
 use Filament\Pages\Page;
 use App\Filament\Widgets\LaporanPenjualanChart;
 
@@ -22,6 +24,8 @@ class LaporanPenjualan extends Page
     {
         return [
             LaporanPenjualanChart::class,
+            LaporanPembelianChart::class,
+            LaporanLabaChart::class,
         ];
     }
 }

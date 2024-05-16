@@ -10,6 +10,15 @@ class Absensi extends Model
 {
     use HasFactory;
 
+    // Testing DB (Deleteable)
+    protected $fillable = [
+        'karyawan_id',
+        'tanggal_waktu',
+    ];
+
+    public $timestamps = false;
+
+
     public function karyawan(): HasMany {
         return $this->hasMany(Karyawan::class);
     }

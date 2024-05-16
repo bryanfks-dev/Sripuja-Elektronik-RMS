@@ -10,11 +10,17 @@ class DetailPenjualan extends Model
 {
     use HasFactory;
 
+
     protected $fillable = [
-        'id_barang',
-        'id_penjualan',
-        'jumlah'
+        'barang_id',
+        'penjualan_id',
+        'jumlah',
+        // Testing DB (Deleteable)
+        'harga_jual',
+        'sub_total',
     ];
+
+    public $timestamps = false;
 
     public function penjualan(): BelongsTo
     {
