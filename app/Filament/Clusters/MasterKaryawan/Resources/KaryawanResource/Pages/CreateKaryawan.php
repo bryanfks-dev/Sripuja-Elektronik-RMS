@@ -56,7 +56,7 @@ class CreateKaryawan extends CreateRecord
     protected function getCancelFormAction(): Action
     {
         return Action::make('cancel')
-            ->label('Batal')
+            ->label('Batalkan')
             ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
             ->color('gray');
     }
