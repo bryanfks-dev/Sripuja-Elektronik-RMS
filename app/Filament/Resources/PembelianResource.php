@@ -14,6 +14,7 @@ use Filament\Support\RawJs;
 use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\SupplierResource;
 use App\Filament\Resources\PembelianResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
@@ -208,7 +210,23 @@ class PembelianResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('status')->label('Status Pembayaran')
-                    ->options(self::$statues)
+                    ->options(self::$statues),
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')->label('Periode Awal'),
+                        DatePicker::make('created_until')->label('Periode Akhir'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
