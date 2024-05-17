@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('detail_penjualans', function (Blueprint $table) {
             $table->id();
-            $table->integer('barang_id')->unsigned()->index();
-            $table->integer('penjualan_id')->unsigned()->index();
+            $table->integer('barang_id')->nullable()->unsigned()->index();
+            $table->integer('penjualan_id')->nullable()->unsigned()->index();
             $table->integer('jumlah')->unsigned();
             $table->integer('harga_jual')->unsigned();
             $table->integer('sub_total')->unsigned();
 
             $table->foreign('barang_id')->references('id')
-                ->on('barangs');
+                ->on('barangs')->onDelete('set null');
             $table->foreign('penjualan_id')->references('id')
-                ->on('penjualans')->onDelete('cascade');
+                ->on('penjualans')->onDelete('set null');
         });
     }
 

@@ -2,20 +2,13 @@
 
 namespace App\Filament\Clusters\MasterKaryawan\Resources;
 
-use Filament\Tables;
-use Livewire\Component;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Support\Colors\Color;
-use Filament\Forms\Components\Checkbox;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
 use App\Filament\Clusters\MasterKaryawan;
 use Filament\Pages\SubNavigationPosition;
-use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Clusters\MasterKaryawan\Resources\AbsensiResource\Pages;
 
 class AbsensiResource extends Resource
@@ -25,8 +18,6 @@ class AbsensiResource extends Resource
     protected static ?string $model = Karyawan::class;
 
     protected static ?string $pluralModelLabel = 'Data Absensi';
-
-    /* protected static ?string $navigationIcon = 'heroicon-m-cube'; */
 
     protected static ?string $navigationLabel = 'Data Absensi';
 

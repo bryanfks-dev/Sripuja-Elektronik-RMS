@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Pembelian;
 use Filament\Tables;
 use App\Models\Supplier;
 use Filament\Forms\Form;
@@ -67,15 +66,7 @@ class SupplierResource extends Resource
                 TextColumn::make('pembelian_terakhir')->label('Pembelian Terakhir')
                     ->date('d M Y')->placeholder('-')
                     ->getStateUsing(function (Supplier $model) {
-                        $supplierId = $model->id;
-
-                        $pembelians =
-                            Pembelian::where('supplier_id', '=', $supplierId)
-                                ->latest()->get('created_at');
-
-                        if (!$pembelians->isEmpty()) {
-                            return $pembelians[0]->created_at;
-                        }
+                        return $model->pembelians()->latest()->first('created_at')->created_at;
                     })
                     ->sortable(),
             ])

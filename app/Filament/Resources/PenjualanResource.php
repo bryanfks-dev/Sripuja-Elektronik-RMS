@@ -18,12 +18,14 @@ use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Filters\Filter;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Placeholder;
 use App\Filament\Resources\PelangganResource;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
@@ -92,7 +94,7 @@ class PenjualanResource extends Resource
                                             self::updateDatasPrimary($get, $set);
                                         }
                                     )
-                                    ->required(),
+                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()->required(),
                                 TextInput::make('jumlah')->numeric()->minValue(1)
                                     ->default(1)->maxValue(function (Get $get) {
                                         if (!empty ($barangId = $get('barang_id'))) {
@@ -119,6 +121,69 @@ class PenjualanResource extends Resource
                                     ->numeric()->default(0)->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')->readOnly(),
                             ])
+                            ->columnSpan('full')->stackAt(MaxWidth::Medium)
+                            ->createItemButtonLabel('Tambah Penjualan')
+                            ->emptyLabel('Tidak ada detail penjualan')
+                            // Mutate data before save in create mode
+                            ->mutateRelationshipDataBeforeCreateUsing(
+                                function (array $data) {
+                                    Barang::modifyStock($data['barang_id'], -1 * $data['jumlah']);
+
+                                    return $data;
+                                }
+                            )
+                            // Mutate Data before save in editing mode
+                            ->mutateRelationshipDataBeforeSaveUsing(
+                                function (array $data, DetailPenjualan $model) {
+                                    // There 2 likely case when user updating things
+                                    // First, whether user upadting the indetifier
+                                    // Second, user not updating the indetifier
+
+                                    // In this context, barang_id is the identifier of
+                                    // the record
+
+                                    // User not changing the nama_barang
+                                    if ($model->barang_id == $data['barang_id']) {
+                                        // For updating stock value, we could asume for n is stock value
+                                        // and new n = n + x, with x is a difference between old and new
+                                        // value of jumlah in detail_penjualan.
+
+                                        // Evaluate jumlah value
+                                        $detailPenjualanOldJumlah = $model->jumlah;
+
+                                        // Calculate difference value between old and new value
+                                        $diff = $data['jumlah'] - $detailPenjualanOldJumlah;
+
+                                        Barang::modifyStock($data['barang_id'], -1 * $diff);
+                                    } else {
+                                        // Normalize barang stock
+                                        Barang::modifyStock($model->barang_id, $model->jumlah);
+
+                                        // Add new jumlah to other barang stock
+                                        Barang::modifyStock($data['barang_id'], -1 * $data['jumlah']);
+                                    }
+
+                                    return $data;
+                                }
+                            ),
+                        Section::make()
+                            ->extraAttributes(['class' => '!mt-6'])
+                            ->schema([
+                                Placeholder::make('total_penjualan')->label('Total Biaya Penjualan')
+                                    ->inlineLabel()
+                                    ->extraAttributes(['class' => 'text-right font-semibold'])
+                                    ->content(function (Get $get) {
+                                        $sum = 0;
+
+                                        $pembelians = $get('detail_penjualan');
+
+                                        foreach ($pembelians as $data) {
+                                            $sum += $data['sub_total'];
+                                        }
+
+                                        return 'Rp ' . number_format($sum, 2);
+                                    })
+                            ]),
                     ])
             ]);
     }
@@ -226,11 +291,11 @@ class PenjualanResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
             ])

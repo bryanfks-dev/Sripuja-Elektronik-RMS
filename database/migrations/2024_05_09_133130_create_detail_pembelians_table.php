@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('detail_pembelians', function (Blueprint $table) {
             $table->id();
-            $table->integer('barang_id')->unsigned()->index();
+            $table->integer('barang_id')->nullable()->unsigned()->index();
             $table->integer('pembelian_id')->unsigned()->index();
             $table->integer('jumlah')->unsigned();
             $table->integer('sub_total')->unsigned();
 
             $table->foreign('barang_id')->references('id')
-                ->on('barangs');
+                ->on('barangs')->onDelete('set null');
             $table->foreign('pembelian_id')->references('id')
                 ->on('pembelians')->onDelete('cascade');
         });

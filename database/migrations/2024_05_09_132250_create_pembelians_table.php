@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pembelians', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->integer('supplier_id')->unsigned();
+            $table->integer('supplier_id')->nullable()->unsigned();
             $table->string('no_nota')->unique();
             $table->string('no_faktur')->unique();
             $table->date('jatuh_tempo');
@@ -21,7 +21,7 @@ return new class extends Migration
                 ->default('Belum Lunas');
 
             $table->foreign('supplier_id')->references('id')
-                ->on('suppliers');
+                ->on('suppliers')->onDelete('set null');
 
             $table->timestamps();
         });

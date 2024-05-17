@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\DetailPenjualan;
-use App\Models\Penjualan;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Pelanggan;
@@ -60,22 +58,8 @@ class PelangganResource extends Resource
                 TextColumn::make('total_pembelian')->label('Total Pembelian')
                     ->money('Rp ')->default(0)
                     ->getStateUsing(
-                        function (Pelanggan $model) {
-                            $pelangganId = $model->id;
-
-                            $penjualans =
-                                Penjualan::where('pelanggan_id', '=', $pelangganId)
-                                    ->get('id');
-
-                            $sum = 0;
-
-                            for ($i = 0; $i < count($penjualans); $i++) {
-                                $sum += DetailPenjualan::where('penjualan_id', $penjualans[$i]->id)
-                                    ->sum('sub_total');
-                            }
-
-                            return $sum;
-                        }
+                        fn(Pelanggan $model) =>
+                        $model->detailPenjualans()->sum('sub_total')
                     )
                     ->sortable(),
             ])

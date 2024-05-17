@@ -25,8 +25,6 @@ class Pembelian extends Model
         'status' => PembayaranStatus::class
     ];
 
-    public $timestamps = false;
-
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);

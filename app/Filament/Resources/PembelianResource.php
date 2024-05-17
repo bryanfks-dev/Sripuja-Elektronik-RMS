@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\DetailPembelian;
 use App\Models\Nota;
+use Filament\Forms\Components\Placeholder;
 use Filament\Tables;
 use App\Models\Barang;
 use Filament\Forms\Get;
@@ -11,7 +13,6 @@ use Filament\Forms\Form;
 use App\Models\Pembelian;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Tables\Filters\Filter;
@@ -19,7 +20,6 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
@@ -57,14 +57,18 @@ class PembelianResource extends Resource
                 Section::make('Data Pembelian')
                     ->schema([
                         TextInput::make('no_nota')->label('Nomor Nota')
+                            ->unique(ignoreRecord: true)
                             ->autocapitalize('characters')
                             ->default(Nota::generateNoNotaPembelian())->required(),
                         TextInput::make('no_faktur')->label('Nomor Faktur')
-                            ->autocapitalize('characters')->required(),
-                        DatePicker::make('jatuh_tempo')->label('Jatuh Tempo')
+                            ->unique(ignoreRecord: true)->autocapitalize('characters')
                             ->required(),
-                        DatePicker::make('created_at')->label('Tanggal')
+                        DatePicker::make('created_at')->label(label: 'Tanggal')
                             ->default(now())->dehydrated(false)->readOnly(),
+                        DatePicker::make('jatuh_tempo')->label('Jatuh Tempo')
+                            ->native(false)->displayFormat('m / d / Y')
+                            ->placeholder('mm-dd-yy')->minDate(now())
+                            ->closeOnDateSelection()->required(),
                         Select::make('supplier_id')->label('Nama Supplier')
                             ->relationship('supplier', 'nama')
                             ->searchable()->preload()->native(false)
@@ -102,7 +106,8 @@ class PembelianResource extends Resource
                                             self::updateDatas($get, $set);
                                         }
                                     )
-                                    ->native(false)->required(),
+                                    ->native(false)->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                    ->required(),
                                 TextInput::make('jumlah')->numeric()->default(1)
                                     ->minValue(1)->live()->afterStateUpdated(
                                         function (Get $get, Set $set) {
@@ -127,7 +132,14 @@ class PembelianResource extends Resource
                             )
                             // Mutate Data before save in editing mode
                             ->mutateRelationshipDataBeforeSaveUsing(
-                                function (array $data, Model $model) {
+                                function (array $data, DetailPembelian $model) {
+                                    // There 2 likely case when user updating things
+                                    // First, whether user upadting the indetifier
+                                    // Second, user not updating the indetifier
+
+                                    // In this context, barang_id is the identifier of
+                                    // the record
+
                                     // User not changing the nama_barang
                                     if ($model->barang_id == $data['barang_id']) {
                                         // For updating stock value, we could asume for n is stock value
@@ -151,7 +163,25 @@ class PembelianResource extends Resource
 
                                     return $data;
                                 }
-                            )
+                            ),
+                        Section::make()
+                            ->extraAttributes(['class' => '!mt-6'])
+                            ->schema([
+                                Placeholder::make('total_pembelian')->label('Total Biaya Pembelian')
+                                    ->inlineLabel()
+                                    ->extraAttributes(['class' => 'text-right font-semibold'])
+                                    ->content(function (Get $get) {
+                                        $sum = 0;
+
+                                        $pembelians = $get('detail_pembelian');
+
+                                        foreach ($pembelians as $data) {
+                                            $sum += $data['sub_total'];
+                                        }
+
+                                        return 'Rp ' . number_format($sum, 2);
+                                    })
+                            ]),
                     ])
             ]);
     }
@@ -195,17 +225,10 @@ class PembelianResource extends Resource
                 TextColumn::make('status')->label('Status Pembayaran')
                     ->badge(),
                 TextColumn::make('total')->label('Total')->money('Rp ')
-                    ->getStateUsing(function (Pembelian $model) {
-                        $pembelianId = $model->id;
-
-                        $subTotals = DetailPembelian::where(
-                            'pembelian_id',
-                            '=',
-                            $pembelianId
-                        )->sum('sub_total');
-
-                        return $subTotals;
-                    })
+                    ->getStateUsing(
+                        fn(Pembelian $model) =>
+                        $model->detailPembelians()->sum('sub_total')
+                    )
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -220,11 +243,11 @@ class PembelianResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
             ])
