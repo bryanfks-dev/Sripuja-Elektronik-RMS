@@ -7,8 +7,11 @@ use App\Models\Supplier;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\SupplierResource\Pages;
 
 class SupplierResource extends Resource
@@ -75,10 +78,28 @@ class SupplierResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Action::make('delete')->label('Hapus')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Data Supplier')
+                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                        ->modalButton('Hapus')
+                        ->modalCloseButton()
+                        ->modalCancelActionLabel('Batalkan')
+                        ->icon('heroicon-c-trash')->color('danger')
+                        ->action(function (Supplier $record) {
+                            $record->delete();
+                        }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Supplier yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Collection $records) => $records->each->delete()),
             ]);
     }
 

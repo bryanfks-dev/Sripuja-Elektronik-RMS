@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\DetailPembelian;
 use App\Models\Nota;
-use Filament\Forms\Components\Placeholder;
 use Filament\Tables;
 use App\Models\Barang;
 use Filament\Forms\Get;
@@ -13,18 +11,23 @@ use Filament\Forms\Form;
 use App\Models\Pembelian;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
+use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Placeholder;
 use App\Filament\Resources\SupplierResource;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\PembelianResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use App\Filament\Clusters\MasterBarang\Resources\BarangResource;
@@ -87,6 +90,7 @@ class PembelianResource extends Resource
                         TableRepeater::make('detail_pembelian')
                             ->hiddenLabel()
                             ->relationship('detailPembelians')
+                            ->minItems(1)
                             ->headers([
                                 Header::make('barang_id')->label('Nama Barang')
                                     ->width('50%')->markAsRequired(),
@@ -140,22 +144,23 @@ class PembelianResource extends Resource
                                     // In this context, barang_id is the identifier of
                                     // the record
 
+                                    $model = $model->getOriginal();
+
                                     // User not changing the nama_barang
-                                    if ($model->barang_id == $data['barang_id']) {
+                                    if ($model['barang_id'] == $data['barang_id']) {
                                         // For updating stock value, we could asume for n is stock value
                                         // and new n = n + x, with x is a difference between old and new
                                         // value of jumlah in detail_pembelian.
 
-                                        // Evaluate jumlah value
-                                        $detailPembelianOldJumlah = $model->jumlah;
-
                                         // Calculate difference value between old and new value
-                                        $diff = $data['jumlah'] - $detailPembelianOldJumlah;
+                                        $diff = $data['jumlah'] - $model['jumlah'];
 
                                         Barang::modifyStock($data['barang_id'], $diff);
                                     } else {
-                                        // Normalize barang stock
-                                        Barang::modifyStock($model->barang_id, -1 * $model->jumlah);
+                                        if ($model['barang_id'] != null) {
+                                            // Normalize barang stock
+                                            Barang::modifyStock($model['barang_id'], -1 * $model['jumlah']);
+                                        }
 
                                         // Add new jumlah to other barang stock
                                         Barang::modifyStock($data['barang_id'], $data['jumlah']);
@@ -179,7 +184,7 @@ class PembelianResource extends Resource
                                             $sum += $data['sub_total'];
                                         }
 
-                                        return 'Rp ' . number_format($sum, 2);
+                                        return 'Rp ' . number_format($sum, 0, '.', '.');
                                     })
                             ]),
                     ])
@@ -200,14 +205,34 @@ class PembelianResource extends Resource
 
             $jumlah = intval($get('jumlah'));
 
-            $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
-            $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
+            // Beware that 0 cannot be used in divsion and modulo cannot
+            if ($barang->jumlah_per_grosir > 0) {
+                $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
+                $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
 
-            $set('sub_total', ($jumlahGrosir * $barang->harga_grosir)
-                + ($remainingJumlah * $barang->harga_beli));
+                $set('sub_total', ($jumlahGrosir * $barang->harga_grosir)
+                    + ($remainingJumlah * $barang->harga_beli));
+
+                return;
+            }
+
+            $set('sub_total', ($jumlah * $barang->harga_beli));
         } else {
             $set('sub_total', 0);
         }
+    }
+
+    private static function deletePembelian(Pembelian $record)
+    {
+        $detailPembelians = $record->detailPembelians()->get();
+
+        foreach ($detailPembelians as $data) {
+            if (($barangId = $data->barang_id) != null) {
+                Barang::modifyStock($barangId, -1 * $data->jumlah);
+            }
+        }
+
+        $record->delete();
     }
 
     public static function table(Table $table): Table
@@ -256,10 +281,29 @@ class PembelianResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Action::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Pembelian')
+                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Pembelian $record) => self::deletePembelian($record)),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Pembelian yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(function (Collection $records) {
+                        $records->each(fn(Pembelian $record) =>
+                            self::deletePembelian($record));
+                    }),
             ]);
     }
 

@@ -30,7 +30,8 @@ class EditBarang extends EditRecord
         return $form
             ->schema([
                 TextInput::make('kode_barang')->label('Kode Barang')
-                    ->unique()->autocapitalize('characters')->required(),
+                    ->unique(ignoreRecord: true)
+                    ->autocapitalize('characters')->required(),
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->autocapitalize('sentences')->required(),
                 Select::make('merek_barang_id')->label('Merek Barang')

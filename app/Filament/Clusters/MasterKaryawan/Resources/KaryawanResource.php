@@ -7,13 +7,16 @@ use App\Models\Karyawan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Clusters\MasterKaryawan;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Clusters\MasterKaryawan\Resources\KaryawanResource\Pages;
 
 class KaryawanResource extends Resource
@@ -51,7 +54,7 @@ class KaryawanResource extends Resource
                     ->maxLength(13)->telRegex('/^08[1-9][0-9]{6,10}$/')
                     ->required(),
                 Select::make('tipe')->label('Tipe Karyawan')
-                    ->native(false)->options(KaryawanResource:: $karyawanTypes)
+                    ->native(false)->options(KaryawanResource::$karyawanTypes)
                     ->default('Non-Kasir')->required(),
                 TextInput::make('gaji')->numeric()->prefix('Rp.')
                     ->mask(RawJs::make('$money($input)'))->stripCharacters(',')
@@ -78,10 +81,28 @@ class KaryawanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Action::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Karyawan')
+                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(function (Karyawan $record) {
+                        $record->delete();
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Karyawan yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Collection $records) => $records->each->delete()),
             ]);
     }
 

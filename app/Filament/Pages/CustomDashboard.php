@@ -12,6 +12,8 @@ class CustomDashboard extends Page
 
     protected static string $view = 'filament.pages.custom-dashboard';
 
+    protected static ?string $title = 'Dashboard';
+
     protected ?string $heading = 'Dashboard';
 
     protected static ?string $slug = 'dashboard';

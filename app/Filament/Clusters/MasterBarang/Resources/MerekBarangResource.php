@@ -7,10 +7,13 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\MerekBarang;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use App\Filament\Clusters\MasterBarang;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\SubNavigationPosition;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
 
 class MerekBarangResource extends Resource
@@ -55,10 +58,28 @@ class MerekBarangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Action::make('delete')->label('Hapus')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Merek Barang')
+                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                        ->modalButton('Hapus')
+                        ->modalCloseButton()
+                        ->modalCancelActionLabel('Batalkan')
+                        ->icon('heroicon-c-trash')->color('danger')
+                        ->action(function (MerekBarang $record) {
+                            $record->delete();
+                        }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Merek Barang yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Collection $records) => $records->each->delete()),
             ]);
     }
 

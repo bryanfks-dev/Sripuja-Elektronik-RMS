@@ -17,15 +17,18 @@ use App\Models\DetailPenjualan;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Placeholder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\PelangganResource;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
@@ -76,6 +79,7 @@ class PenjualanResource extends Resource
                         TableRepeater::make('detail_penjualan')
                             ->hiddenLabel()
                             ->relationship('detailPenjualans')
+                            ->minItems(1)
                             ->headers([
                                 Header::make('barang_id')->label('Nama Barang')
                                     ->width('50%')->markAsRequired(),
@@ -142,22 +146,23 @@ class PenjualanResource extends Resource
                                     // In this context, barang_id is the identifier of
                                     // the record
 
+                                    $model = $model->getOriginal();
+
                                     // User not changing the nama_barang
-                                    if ($model->barang_id == $data['barang_id']) {
+                                    if ($model['barang_id'] == $data['barang_id']) {
                                         // For updating stock value, we could asume for n is stock value
                                         // and new n = n + x, with x is a difference between old and new
                                         // value of jumlah in detail_penjualan.
 
-                                        // Evaluate jumlah value
-                                        $detailPenjualanOldJumlah = $model->jumlah;
-
                                         // Calculate difference value between old and new value
-                                        $diff = $data['jumlah'] - $detailPenjualanOldJumlah;
+                                        $diff = $data['jumlah'] - $model['jumlah'];
 
                                         Barang::modifyStock($data['barang_id'], -1 * $diff);
                                     } else {
-                                        // Normalize barang stock
-                                        Barang::modifyStock($model->barang_id, $model->jumlah);
+                                        if ($model['barang_id'] != null) {
+                                            // Normalize barang stock
+                                            Barang::modifyStock($model['barang_id'], $model['jumlah']);
+                                        }
 
                                         // Add new jumlah to other barang stock
                                         Barang::modifyStock($data['barang_id'], -1 * $data['jumlah']);
@@ -181,7 +186,7 @@ class PenjualanResource extends Resource
                                             $sum += $data['sub_total'];
                                         }
 
-                                        return 'Rp ' . number_format($sum, 2);
+                                        return 'Rp ' . number_format($sum, 0, '.', '.');
                                     })
                             ]),
                     ])
@@ -194,10 +199,15 @@ class PenjualanResource extends Resource
             $hargaJual = $barang->harga_jual;
         }
 
-        $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
-        $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
+        // Beware that 0 cannot be used in divsion and modulo cannot
+        if ($barang->jumlah_per_grosir > 0) {
+            $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
+            $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
 
-        return ($jumlahGrosir * $barang->harga_grosir) + ($remainingJumlah * $hargaJual);
+            return ($jumlahGrosir * $barang->harga_grosir) + ($remainingJumlah * $hargaJual);
+        }
+
+        return $jumlah * $hargaJual;
     }
 
     private static function updateDatasPrimary(Get $get, Set $set)
@@ -239,6 +249,19 @@ class PenjualanResource extends Resource
                 )
             );
         }
+    }
+
+    private static function deletePenjualan(Penjualan $record)
+    {
+        $detailPenjualans = $record->detailPenjualans()->get();
+
+        foreach ($detailPenjualans as $data) {
+            if (($barangId = $data->barang_id) != null) {
+                Barang::modifyStock($barangId, $data->jumlah);
+            }
+        }
+
+        $record->delete();
     }
 
     public static function table(Table $table): Table
@@ -300,10 +323,29 @@ class PenjualanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Action::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Penjualan')
+                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Penjualan yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(function (Collection $records) {
+                        $records->each(fn(Penjualan $record) =>
+                            self::deletePenjualan($record));
+                    }),
             ]);
     }
 

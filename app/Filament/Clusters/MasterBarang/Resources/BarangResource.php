@@ -8,12 +8,16 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use App\Filament\Clusters\MasterBarang;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Pages\SubNavigationPosition;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Clusters\MasterBarang\Resources\BarangResource\Pages;
 
 class BarangResource extends Resource
@@ -23,8 +27,6 @@ class BarangResource extends Resource
     protected static ?string $model = Barang::class;
 
     protected static ?string $pluralModelLabel = 'Data Barang';
-
-    /* protected static ?string $navigationIcon = 'heroicon-m-cube'; */
 
     protected static ?string $navigationLabel = 'Data Barang';
 
@@ -37,24 +39,25 @@ class BarangResource extends Resource
         return $form
             ->schema([
                 TextInput::make('kode_barang')->label('Kode Barang')
-                    ->unique(ignoreRecord: true)->autocapitalize('characters')->required(),
+                    ->unique(ignoreRecord: true)
+                    ->autocapitalize('characters')->required(),
                 TextInput::make('nama_barang')->label('Nama Barang')
                     ->autocapitalize('sentences')->required(),
                 Select::make('merek_barang_id')->label('Merek Barang')
                     ->relationship('merekBarang', 'nama_merek')
                     ->searchable()->preload()->native(false)
-                            ->createOptionForm(
-                                fn(Form $form) => MerekBarangResource::form($form)
-                                    ->columns(['md' => 2])
-                            )
+                    ->createOptionForm(
+                        fn(Form $form) => MerekBarangResource::form($form)
+                            ->columns(['md' => 2])
+                    )
                     ->required(),
                 Select::make('jenis_barang_id')->label('Jenis Barang')
                     ->relationship('jenisBarang', 'nama_jenis')
                     ->searchable()->preload()->native(false)
-                            ->createOptionForm(
-                                fn(Form $form) => JenisBarangResource::form($form)
-                                    ->columns(['md' => 2])
-                            )
+                    ->createOptionForm(
+                        fn(Form $form) => JenisBarangResource::form($form)
+                            ->columns(['md' => 2])
+                    )
                     ->required(),
                 TextInput::make('jumlah_per_grosir')->label('Jumlah / Grosir')
                     ->numeric()->minValue(0)->default(0)->required(),
@@ -100,11 +103,29 @@ class BarangResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()->color('white'),
-                    Tables\Actions\DeleteAction::make()->label('Hapus'),
+                    Action::make('delete')->label('Hapus')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Data Barang')
+                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                        ->modalButton('Hapus')
+                        ->modalCloseButton()
+                        ->modalCancelActionLabel('Batalkan')
+                        ->icon('heroicon-c-trash')->color('danger')
+                        ->action(function (Barang $record) {
+                            $record->delete();
+                        }),
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
+                BulkAction::make('delete')->label('Hapus')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Barang yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Collection $records) => $records->each->delete()),
             ]);
     }
 

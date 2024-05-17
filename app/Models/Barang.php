@@ -25,7 +25,7 @@ class Barang extends Model
 
     public static function modifyStock($id, $val)
     {
-        $barang = Barang::find($id);
+        $barang = self::find($id);
         $barang->stock += $val;
 
         // Save barang new value

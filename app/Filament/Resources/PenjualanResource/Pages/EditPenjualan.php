@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\PenjualanResource\Pages;
 
+use App\Models\Penjualan;
 use Filament\Actions;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Js;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -17,6 +19,24 @@ class EditPenjualan extends EditRecord
         return [
             Actions\DeleteAction::make()->label('Hapus'),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['user_id'] = auth()->id();
+
+        return $data;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Penjualan
+    {
+        // Remove no_invoice from data
+        unset($data['no_invoice']);
+
+        // Create penjualan
+        $record->update($data);
+
+        return $record;
     }
 
     protected function getSaveFormAction(): Action
