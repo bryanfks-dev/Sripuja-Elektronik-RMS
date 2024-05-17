@@ -236,8 +236,11 @@ class PembelianResource extends Resource
                     ->options(self::$statues),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')->label('Periode Awal'),
-                        DatePicker::make('created_until')->label('Periode Akhir'),
+                        DatePicker::make('created_from')->label('Periode Awal')
+                            ->placeholder('mm / dd / yy')->native(false),
+                        DatePicker::make('created_until')->label('Periode Akhir')
+                            ->placeholder('mm / dd / yy')->native(false)
+                            ->minDate(fn(Get $get) => $get('created_from')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -256,7 +259,7 @@ class PembelianResource extends Resource
                 Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
             ]);
     }
 

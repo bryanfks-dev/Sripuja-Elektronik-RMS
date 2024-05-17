@@ -78,7 +78,7 @@ class SupplierResource extends Resource
                 Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
             ]);
     }
 

@@ -255,13 +255,9 @@ class PenjualanResource extends Resource
                     ->searchable(),
                 TextColumn::make('total_pembelian')->label('Total Pembelian')
                     ->money('Rp ')->default(0)->placeholder('-')
-                    ->getStateUsing(function (Penjualan $model) {
-                        $detailPenjualans =
-                            DetailPenjualan::where('penjualan_id', '=', $model->id)
-                                ->sum('sub_total');
-
-                        return $detailPenjualans;
-                    })->sortable(),
+                    ->getStateUsing(
+                        fn(Penjualan $model) => $model->detailPenjualans()->sum('sub_total')
+                    )->sortable(),
                 TextColumn::make('user.username')->label('Kasir')
                     ->color(
                         function (Penjualan $model) {
@@ -284,8 +280,11 @@ class PenjualanResource extends Resource
                     ->preload()->searchable(),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')->label('Periode Awal'),
-                        DatePicker::make('created_until')->label('Periode Akhir'),
+                        DatePicker::make('created_from')->label('Periode Awal')
+                            ->placeholder('mm / dd / yy')->native(false),
+                        DatePicker::make('created_until')->label('Periode Akhir')
+                            ->placeholder('mm / dd / yy')->native(false)
+                            ->minDate(fn(Get $get) => $get('created_from')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -304,7 +303,7 @@ class PenjualanResource extends Resource
                 Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
             ]);
     }
 

@@ -6,9 +6,12 @@ use App\Models\Karyawan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Clusters\MasterKaryawan;
 use Filament\Pages\SubNavigationPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Clusters\MasterKaryawan\Resources\AbsensiResource\Pages;
 
 class AbsensiResource extends Resource
@@ -40,7 +43,7 @@ class AbsensiResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('nama_lengkap')->label('Nama Karyawan'),
-                TextColumn::make('waktu')->label('Waktu Absen')
+                TextColumn::make('tanggal_waktu')->label('Waktu Absen')
                     ->placeholder('-')
                     ->date('H:i:s')
                     ->getStateUsing(function (Karyawan $model) {
@@ -55,7 +58,36 @@ class AbsensiResource extends Resource
                     }),
             ])
             ->filters([
-                //
+                SelectFilter::make('kehadiran')->label('Kehadiran')
+                    ->options([
+                        'hadir' => 'Hadir',
+                        'tidak_hadir' => 'Tidak Hadir'
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                function (Builder $query, $value): Builder {
+                                    $notPresents =
+                                        DB::table('karyawans')
+                                            ->leftJoin('absensis', function ($join) {
+                                                $today = date('Y-m-d');
+
+                                                $join->on('absensis.karyawan_id', '=', 'karyawans.id')
+                                                    ->on(DB::raw("DATE(absensis.tanggal_waktu)"), '=', DB::raw("DATE('$today')"));
+                                            })
+                                            ->whereNull('absensis.tanggal_waktu')
+                                            ->get('karyawans.id')
+                                            ->map(fn($val) => $val->id)->toArray();
+
+                                    if ($value == 'hadir') {
+                                        return $query->whereNotIn('id', $notPresents);
+                                    }
+
+                                    return $query->whereIn('id', $notPresents);
+                                },
+                            );
+                    }),
             ])
             ->actions([
                 //
@@ -63,6 +95,11 @@ class AbsensiResource extends Resource
             ->bulkActions([
                 //
             ]);
+    }
+
+    private static function changePresentStatus($model)
+    {
+        dd($model);
     }
 
     public static function getRelations(): array

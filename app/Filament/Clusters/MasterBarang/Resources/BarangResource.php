@@ -104,7 +104,7 @@ class BarangResource extends Resource
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
             ]);
     }
 

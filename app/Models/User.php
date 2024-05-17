@@ -58,7 +58,7 @@ class User extends Authenticatable implements HasName
         return $this->hasOne(Karyawan::class);
     }
 
-    public function penjualan(): HasMany
+    public function penjualans(): HasMany
     {
         return $this->hasMany(Penjualan::class);
     }
