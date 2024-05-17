@@ -84,7 +84,7 @@ class PelangganResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()->label('Hapus'),
+                Tables\Actions\DeleteAction::make()->label('Hapus')
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

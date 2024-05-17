@@ -6,8 +6,8 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use App\Filament\Auth\CustomLogin;
 use Filament\Support\Colors\Color;
-use Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\CustomDashboard;
+use App\Filament\Pages\CustomEditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -35,7 +35,7 @@ class UserPanelProvider extends PanelProvider
             ->brandLogoHeight('2.8rem')
             ->login(CustomLogin::class)
             ->passwordReset(ResetPassword::class)
-            ->profile(EditProfile::class)
+            ->profile(CustomEditProfile::class)
             ->viteTheme('resources/css/filament/user/theme.css')
             // Sort navigation group
             ->navigationGroups([
