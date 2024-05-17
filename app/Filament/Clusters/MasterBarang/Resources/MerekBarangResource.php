@@ -3,14 +3,12 @@
 namespace App\Filament\Clusters\MasterBarang\Resources;
 
 use Filament\Tables;
-use App\Models\Barang;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\MerekBarang;
 use Filament\Resources\Resource;
 use App\Filament\Clusters\MasterBarang;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\SubNavigationPosition;
 use App\Filament\Clusters\MasterBarang\Resources\MerekBarangResource\Pages;
@@ -48,12 +46,8 @@ class MerekBarangResource extends Resource
                 TextColumn::make('jumlah')->label('Jumlah Barang')
                     ->numeric()->default(0)
                     ->getStateUsing(
-                        function(Model $model) {
-                            $sameMerek = Barang::where('merek_barang_id', '=', $model->id)
-                                ->count();
-
-                            return $sameMerek;
-                    })
+                        fn(MerekBarang $model) => $model->barangs()->count()
+                    )
             ])
             ->defaultSort('updated_at', 'desc')
             ->filters([

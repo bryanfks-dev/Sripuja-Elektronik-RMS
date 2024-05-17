@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\MasterBarang\Resources;
 
-use App\Models\Barang;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -13,7 +12,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\SubNavigationPosition;
 use App\Filament\Clusters\MasterBarang\Resources\JenisBarangResource\Pages;
-use Illuminate\Database\Eloquent\Model;
 
 class JenisBarangResource extends Resource
 {
@@ -22,8 +20,6 @@ class JenisBarangResource extends Resource
     protected static ?string $model = JenisBarang::class;
 
     protected static ?string $pluralModelLabel = 'Jenis Barang';
-
-    /* protected static ?string $navigationIcon = 'heroicon-c-square-3-stack-3d'; */
 
     protected static ?string $navigationLabel = 'Jenis Barang';
 
@@ -48,14 +44,10 @@ class JenisBarangResource extends Resource
                 TextColumn::make('nama_jenis')->label('Jenis Barang')
                     ->searchable(),
                 TextColumn::make('jumlah')->label('Jumlah Barang')
-                ->numeric()->default(0)
-                ->getStateUsing(
-                    function(Model $model) {
-                        $sameJenis = Barang::where('jenis_barang_id', '=', $model->id)
-                            ->count();
-
-                        return $sameJenis;
-                }),
+                    ->numeric()->default(0)
+                    ->getStateUsing(
+                        fn(JenisBarang $model) => $model->barangs()->count()
+                    ),
             ])
             ->defaultSort('updated_at', 'desc')
             ->filters([
