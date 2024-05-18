@@ -2,11 +2,15 @@
 
 namespace App\Filament\Clusters\MasterKaryawan\Resources;
 
+use App\Models\Absensi;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Clusters\MasterKaryawan;
 use Filament\Pages\SubNavigationPosition;
@@ -38,6 +42,23 @@ class AbsensiResource extends Resource
             ]);
     }
 
+    private static function ubahAbsensi(Karyawan $record)
+    {
+        $absensiRecord = $record->absensis()
+            ->whereDate('tanggal_waktu', '=', date('Y-m-d'))
+            ->first();
+
+        if ($absensiRecord == null) {
+            // Create record
+            Absensi::create([
+                'karyawan_id' => $record->id,
+                'tanggal_waktu' => now()
+            ]);
+        } else {
+            $absensiRecord->delete();
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -47,10 +68,8 @@ class AbsensiResource extends Resource
                     ->placeholder('-')
                     ->date('H:i:s')
                     ->getStateUsing(function (Karyawan $model) {
-                        $today = date('Y-m-d');
-
                         $record = $model->absensis()
-                            ->whereDate('tanggal_waktu', '=', $today)->get();
+                            ->whereDate('tanggal_waktu', '=', date('Y-m-d'))->get();
 
                         if (!$record->isEmpty()) {
                             return $record[0]->tanggal_waktu;
@@ -90,10 +109,14 @@ class AbsensiResource extends Resource
                     }),
             ])
             ->actions([
-                //
+                Action::make('ubah')->color('primary')
+                    ->action(fn(Karyawan $record) => self::ubahAbsensi($record))
             ])
             ->bulkActions([
-                //
+                BulkAction::make('ubah')->color('primary')
+                    ->action(function (Collection $records) {
+                        $records->each(fn(Karyawan $record) => self::ubahAbsensi($record));
+                    })
             ]);
     }
 
