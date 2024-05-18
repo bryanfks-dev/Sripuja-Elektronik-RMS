@@ -34,15 +34,15 @@ Schedule::call(function () {
 
         // Subtract Rp 50_000 from karyawans
         DB::table('karyawans')->whereIn('id', DB::table('karyawans')
-                ->select('karyawans.id')
-                ->leftJoin('absensis', function ($join) {
-                    $today = date('Y-m-d');
+            ->select('karyawans.id')
+            ->leftJoin('absensis', function ($join) {
+                $today = date('Y-m-d');
 
-                    $join->on('absensis.karyawan_id', '=', 'karyawans.id')
-                        ->on(DB::raw("DATE(absensis.tanggal_waktu)"), '=', DB::raw("DATE('$today')"));
-                })
-                ->whereNull('absensis.tanggal_waktu')
-                ->orWhere(DB::raw("TIME(absensis.tanggal_waktu)"), '>', DB::raw("TIME('$waktuMasuk')")))
+                $join->on('absensis.karyawan_id', '=', 'karyawans.id')
+                    ->on(DB::raw("DATE(absensis.tanggal_waktu)"), '=', DB::raw("DATE('$today')"));
+            })
+            ->whereNull('absensis.tanggal_waktu')
+            ->orWhere(DB::raw("TIME(absensis.tanggal_waktu)"), '>', DB::raw("TIME('$waktuMasuk')")))
             ->update([
                 'gaji_bln_ini' => DB::raw('CASE WHEN `gaji_bln_ini` > 50000 THEN
                 (`gaji_bln_ini` - 50000) ELSE `gaji_bln_ini` END'),
