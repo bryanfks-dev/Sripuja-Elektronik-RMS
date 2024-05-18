@@ -14,7 +14,7 @@ use Filament\Support\RawJs;
 use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
-use Filament\Tables\Actions\Action;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
@@ -55,6 +55,8 @@ class PembelianResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $isUpdate = $form->getOperation() === 'update';
+
         return $form
             ->schema([
                 Section::make('Data Pembelian')
@@ -126,6 +128,15 @@ class PembelianResource extends Resource
                             ->columnSpan('full')->stackAt(MaxWidth::Medium)
                             ->createItemButtonLabel('Tambah Pembelian')
                             ->emptyLabel('Tidak ada detail pembelian')
+                            ->deleteAction(function(Action $action) {
+                                $action->before(function($state, array $arguments) {
+                                    $record = $state[$arguments['item']];
+
+                                    if (isset($record['id']) && isset($record['barang_id'])) {
+                                        Barang::modifyStock($record['barang_id'], -1 * $record['jumlah']);
+                                    }
+                                });
+                            })
                             // Mutate data before save in create mode
                             ->mutateRelationshipDataBeforeCreateUsing(
                                 function (array $data) {
@@ -137,6 +148,7 @@ class PembelianResource extends Resource
                             // Mutate Data before save in editing mode
                             ->mutateRelationshipDataBeforeSaveUsing(
                                 function (array $data, DetailPembelian $model) {
+                                    dd($data . '.' . $model);
                                     // There 2 likely case when user updating things
                                     // First, whether user upadting the indetifier
                                     // Second, user not updating the indetifier
@@ -281,7 +293,7 @@ class PembelianResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Action::make('delete')->label('Hapus')
+                Tables\Actions\Action::make('delete')->label('Hapus')
                     ->requiresConfirmation()
                     ->modalHeading('Hapus Data Pembelian')
                     ->modalSubheading('Konfirmasi untuk menghapus data ini')

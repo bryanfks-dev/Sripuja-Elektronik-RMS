@@ -17,11 +17,11 @@ use App\Models\DetailPenjualan;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Placeholder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\PelangganResource;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
@@ -128,6 +129,15 @@ class PenjualanResource extends Resource
                             ->columnSpan('full')->stackAt(MaxWidth::Medium)
                             ->createItemButtonLabel('Tambah Penjualan')
                             ->emptyLabel('Tidak ada detail penjualan')
+                            ->deleteAction(function(Action $action) {
+                                $action->before(function($state, array $arguments) {
+                                    $record = $state[$arguments['item']];
+
+                                    if (isset($record['id']) && isset($record['barang_id'])) {
+                                        Barang::modifyStock($record['barang_id'], $record['jumlah']);
+                                    }
+                                });
+                            })
                             // Mutate data before save in create mode
                             ->mutateRelationshipDataBeforeCreateUsing(
                                 function (array $data) {
@@ -159,7 +169,7 @@ class PenjualanResource extends Resource
 
                                         Barang::modifyStock($data['barang_id'], -1 * $diff);
                                     } else {
-                                        if ($model['barang_id'] != null) {
+                                        if (isset($model['barang_id'])) {
                                             // Normalize barang stock
                                             Barang::modifyStock($model['barang_id'], $model['jumlah']);
                                         }
@@ -323,7 +333,7 @@ class PenjualanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Action::make('delete')->label('Hapus')
+                Tables\Actions\Action::make('delete')->label('Hapus')
                     ->requiresConfirmation()
                     ->modalHeading('Hapus Data Penjualan')
                     ->modalSubheading('Konfirmasi untuk menghapus data ini')

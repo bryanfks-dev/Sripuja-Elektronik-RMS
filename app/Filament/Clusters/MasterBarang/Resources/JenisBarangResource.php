@@ -7,7 +7,6 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\JenisBarang;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use App\Filament\Clusters\MasterBarang;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -58,7 +57,7 @@ class JenisBarangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Action::make('delete')->label('Hapus')
+                Tables\Actions\Action::make('delete')->label('Hapus')
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Jenis Barang')
                         ->modalSubheading('Konfirmasi untuk menghapus data ini')

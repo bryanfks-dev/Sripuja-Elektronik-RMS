@@ -8,12 +8,10 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use App\Filament\Clusters\MasterBarang;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Pages\SubNavigationPosition;
@@ -103,7 +101,7 @@ class BarangResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make()->color('white'),
-                    Action::make('delete')->label('Hapus')
+                    Tables\Actions\Action::make('delete')->label('Hapus')
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Data Barang')
                         ->modalSubheading('Konfirmasi untuk menghapus data ini')

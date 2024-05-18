@@ -7,7 +7,6 @@ use App\Models\Karyawan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\BulkAction;
@@ -81,7 +80,7 @@ class KaryawanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Action::make('delete')->label('Hapus')
+                Tables\Actions\Action::make('delete')->label('Hapus')
                     ->requiresConfirmation()
                     ->modalHeading('Hapus Data Karyawan')
                     ->modalSubheading('Konfirmasi untuk menghapus data ini')

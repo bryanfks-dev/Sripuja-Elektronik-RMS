@@ -7,7 +7,6 @@ use Filament\Forms\Form;
 use App\Models\Pelanggan;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -71,7 +70,7 @@ class PelangganResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Action::make('delete')->label('Hapus')
+                Tables\Actions\Action::make('delete')->label('Hapus')
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Data Pelanggan')
                         ->modalSubheading('Konfirmasi untuk menghapus data ini')
