@@ -10,7 +10,6 @@ class DetailPembelian extends Model
 {
     use HasFactory;
 
-    // Testing DB (Deleteable)
     protected $fillable = [
         'pembelian_id',
         'barang_id',

@@ -15,7 +15,6 @@ class DetailPenjualan extends Model
         'barang_id',
         'penjualan_id',
         'jumlah',
-        // Testing DB (Deleteable)
         'harga_jual',
         'sub_total',
     ];
