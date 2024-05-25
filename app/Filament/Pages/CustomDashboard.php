@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\AdminDashboardHeaderStats;
+use App\Filament\Widgets\CheckInKaryawan;
 use App\Filament\Widgets\DataPenjualanChart;
 use Filament\Pages\Page;
 
@@ -23,6 +24,7 @@ class CustomDashboard extends Page
     protected function getHeaderWidgets(): array
     {
         return [
+            CheckInKaryawan::class,
             AdminDashboardHeaderStats::class,
             DataPenjualanChart::class,
         ];

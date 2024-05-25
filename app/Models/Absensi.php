@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Absensi extends Model
 {
     use HasFactory;
 
-    // Testing DB (Deleteable)
     protected $fillable = [
         'karyawan_id',
         'tanggal_waktu',
@@ -19,8 +18,8 @@ class Absensi extends Model
     public $timestamps = false;
 
 
-    public function karyawans(): BelongsToMany
+    public function karyawans(): BelongsTo
     {
-        return $this->belongsToMany(Karyawan::class);
+        return $this->belongsTo(Karyawan::class);
     }
 }
