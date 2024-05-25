@@ -33,7 +33,11 @@ class SupplierResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nama')->autocapitalize('characters')
+                TextInput::make('nama_supplier')->label('Nama Supplier')
+                    ->autocapitalize('characters')
+                    ->required(),
+                TextInput::make('nama_cv')->label('Nama CV')
+                    ->autocapitalize('characters')
                     ->required(),
                 TextInput::make('alamat')->autocapitalize('sentences')
                     ->required(),
@@ -56,7 +60,9 @@ class SupplierResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama')->label('Nama Supplier')
+                TextColumn::make('nama_supplier')->label('Nama Supplier')
+                    ->searchable(),
+                TextColumn::make('nama_cv')->label('Nama CV')
                     ->searchable(),
                 TextColumn::make('alamat'),
                 TextColumn::make('telepon')->placeholder('-'),
@@ -68,7 +74,7 @@ class SupplierResource extends Resource
                 TextColumn::make('pembelian_terakhir')->label('Pembelian Terakhir')
                     ->date('d M Y')->placeholder('-')
                     ->getStateUsing(function (Supplier $model) {
-                        return $model->pembelians()->latest()->first('created_at')->created_at;
+                        return $model->pembelians()->latest()->first('created_at')->created_at ?? '';
                     })
                     ->sortable(),
             ])
@@ -76,18 +82,20 @@ class SupplierResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Data Supplier')
-                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                        ->modalButton('Hapus')
-                        ->modalCloseButton()
-                        ->modalCancelActionLabel('Batalkan')
-                        ->icon('heroicon-c-trash')->color('danger')
-                        ->action(function (Supplier $record) {
-                            $record->delete();
-                        }),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()->color('white'),
+                    Tables\Actions\Action::make('delete')->label('Hapus')
+                            ->requiresConfirmation()
+                            ->modalHeading('Hapus Data Supplier')
+                            ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                            ->modalButton('Hapus')
+                            ->modalCloseButton()
+                            ->modalCancelActionLabel('Batalkan')
+                            ->icon('heroicon-c-trash')->color('danger')
+                            ->action(function (Supplier $record) {
+                                $record->delete();
+                            }),
+                ])
             ])
             ->bulkActions([
                 BulkAction::make('delete')->label('Hapus')

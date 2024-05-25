@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pelanggan extends Model
 {
@@ -27,7 +26,6 @@ class Pelanggan extends Model
 
     public function detailPenjualans(): HasManyThrough
     {
-        return $this->hasManyThrough(DetailPenjualan::class,
-            Penjualan::class, 'id', 'penjualan_id');
+        return $this->hasManyThrough(DetailPenjualan::class, Penjualan::class);
     }
 }

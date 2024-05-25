@@ -13,7 +13,8 @@
         "filament/filament": "^3.2",
         "flowframe/laravel-trend": "^0.2.0",
         "laravel/framework": "^11.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "staudenmeir/belongs-to-through": "^2.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -16,21 +16,10 @@ class Barang extends Model
         'nama_barang',
         'jenis_barang_id',
         'merek_barang_id',
-        'stock',
-        'harga_jual',
-        'harga_beli',
         'jumlah_per_grosir',
-        'harga_grosir',
     ];
 
-    public static function modifyStock($id, $val)
-    {
-        $barang = self::find($id);
-        $barang->stock += $val;
-
-        // Save barang new value
-        $barang->save();
-    }
+    public $timestamps = false;
 
     public function jenisBarang(): BelongsTo
     {
@@ -40,6 +29,11 @@ class Barang extends Model
     public function merekBarang(): BelongsTo
     {
         return $this->belongsTo(MerekBarang::class);
+    }
+
+    public function detailBarangs(): HasMany
+    {
+        return $this->hasMany(DetailBarang::class);
     }
 
     public function detailPenjualans(): HasMany

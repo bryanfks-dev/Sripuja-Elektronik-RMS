@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->string('nama');
+            $table->string('nama_supplier');
+            $table->string('nama_cv');
             $table->string('alamat');
             $table->string('telepon')->nullable();
             $table->string('no_hp', 13);

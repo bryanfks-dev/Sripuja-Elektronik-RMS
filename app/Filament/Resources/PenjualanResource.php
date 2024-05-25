@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\DetailBarang;
 use App\Models\Nota;
 use App\Models\User;
+use Database\Factories\PenjualanFactory;
 use Filament\Tables;
 use App\Models\Barang;
 use App\Models\Invoice;
@@ -21,7 +23,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -34,6 +35,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
+use Illuminate\Database\Eloquent\Model;
 
 class PenjualanResource extends Resource
 {
@@ -94,31 +96,38 @@ class PenjualanResource extends Resource
                             ->schema([
                                 Select::make('barang_id')->relationship('barang', 'nama_barang')
                                     ->native(false)->preload()->searchable()
-                                    ->live()->afterStateUpdated(
+                                    ->live(true)->afterStateUpdated(
                                         function (Get $get, Set $set) {
-                                            self::updateDatasPrimary($get, $set);
+                                            self::updateDatas($get, $set);
                                         }
                                     )
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()->required(),
                                 TextInput::make('jumlah')->numeric()->minValue(1)
-                                    ->default(1)->maxValue(function (Get $get) {
+                                    ->default(1)->maxValue(function (Penjualan $data, Get $get) {
                                         if (!empty ($barangId = $get('barang_id'))) {
-                                            return Barang::find($barangId)->stock;
+                                            $detailPenjualan = $data->detailPenjualans()
+                                                ->where('barang_id', '=', $barangId)->first();
+
+                                            if (isset($detailPenjualan)) {
+                                                return Barang::find($barangId)->detailBarangs()->sum('stock')
+                                                    + self::sumJumlah(json_decode($detailPenjualan->jumlah, true));
+                                            }
+
+                                            return Barang::find($barangId)->detailBarangs()->sum('stock');
                                         }
-                                    })->live()
+                                    })->live(true, 600)
                                     ->afterStateUpdated(
-                                        function (Get $get, Set $set) {
-                                            self::updateDatasSecondary($get, $set);
-                                        }
+                                        fn(Get $get, Set $set) =>
+                                            self::setSubTotal($get, $set)
                                     )
+                                    ->disabled(fn(Get $get) => ($get('barang_id') == null))
                                     ->required(),
                                 TextInput::make('harga_jual')->prefix('Rp ')
                                     ->numeric()->default(0)->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')
-                                    ->live()->afterStateUpdated(
-                                        function (Get $get, Set $set) {
-                                            self::updateDatasSecondary($get, $set);
-                                        }
+                                    ->live(true, 600)->afterStateUpdated(
+                                        fn (Get $get, Set $set) =>
+                                            self::setSubTotal($get, $set)
                                     )
                                     ->disabled(fn(Get $get) => ($get('barang_id') == null))
                                     ->required(),
@@ -129,19 +138,64 @@ class PenjualanResource extends Resource
                             ->columnSpan('full')->stackAt(MaxWidth::Medium)
                             ->createItemButtonLabel('Tambah Penjualan')
                             ->emptyLabel('Tidak ada detail penjualan')
-                            ->deleteAction(function(Action $action) {
-                                $action->before(function($state, array $arguments) {
+                            ->deleteAction(function (Action $action) {
+                                $action->before(function ($state, array $arguments) {
                                     $record = $state[$arguments['item']];
 
-                                    if (isset($record['id']) && isset($record['barang_id'])) {
+                                    if (isset ($record['id']) && isset ($record['barang_id'])) {
                                         Barang::modifyStock($record['barang_id'], $record['jumlah']);
                                     }
                                 });
                             })
+                            ->mutateRelationshipDataBeforeFillUsing(
+                                function(array $data) {
+                                    return [
+                                        'barang_id' => $data['barang_id'],
+                                        'jumlah' => self::sumJumlah(
+                                            json_decode($data['jumlah'], true)),
+                                        'harga_jual' => $data['harga_jual'],
+                                        'sub_total' => $data['sub_total'],
+                                    ];
+                                }
+                            )
                             // Mutate data before save in create mode
                             ->mutateRelationshipDataBeforeCreateUsing(
                                 function (array $data) {
-                                    Barang::modifyStock($data['barang_id'], -1 * $data['jumlah']);
+                                    $detailBarangs =
+                                        Barang::find($data['barang_id'])->detailBarangs()->get();
+
+                                    $tempJumlah = intval($data['jumlah']);
+
+                                    $jumlahJson = [];
+
+                                    // Iterrate through all detail_barangs
+                                    // Drop barang stocks
+                                    foreach ($detailBarangs as $detail) {
+                                        if ($tempJumlah == 0) {
+                                            break;
+                                        }
+
+                                        if ($detail->stock > 0 && $tempJumlah > 0) {
+                                            // Case when jumlah is bigger than current detail barang
+                                            if ($tempJumlah >= $detail->stock) {
+                                                $tempJumlah -= $detail->stock;
+                                                $jumlahJson[$detail->id] = $detail->stock;
+
+                                                DetailBarang::setStock($detail->id, 0);
+
+                                                continue;
+                                            }
+
+                                            $jumlahJson[$detail->id] = $tempJumlah;
+
+                                            // Case when jumlah is smaller than current detail barang
+                                            DetailBarang::modifyStock($detail->id, -1 * $tempJumlah);
+
+                                            $tempJumlah = 0;
+                                        }
+                                    }
+
+                                    $data['jumlah'] = json_encode($jumlahJson);
 
                                     return $data;
                                 }
@@ -156,27 +210,65 @@ class PenjualanResource extends Resource
                                     // In this context, barang_id is the identifier of
                                     // the record
 
-                                    $model = $model->getOriginal();
+                                    $model = $model->detailBarang()->first();
+                                    $model->jumlah = json_decode($model->jumlah, true);
 
                                     // User not changing the nama_barang
-                                    if ($model['barang_id'] == $data['barang_id']) {
+                                    if ($model->barang_id == $data['barang_id']) {
                                         // For updating stock value, we could asume for n is stock value
                                         // and new n = n + x, with x is a difference between old and new
                                         // value of jumlah in detail_penjualan.
 
                                         // Calculate difference value between old and new value
-                                        $diff = $data['jumlah'] - $model['jumlah'];
+                                        $diff = $data['jumlah'] - self::sumJumlah($model->jumlah);
 
-                                        Barang::modifyStock($data['barang_id'], -1 * $diff);
-                                    } else {
-                                        if (isset($model['barang_id'])) {
-                                            // Normalize barang stock
-                                            Barang::modifyStock($model['barang_id'], $model['jumlah']);
+                                        // User input newest jumlah less than old value
+                                        if ($diff < 0) {
+                                            for ($i = count($model->jumlah) - 1; $i >= 0; $i--) {
+                                                if ($diff == 0) {
+                                                    break;
+                                                }
+
+                                                $currJumlah = $model->jumlah[$i];
+                                                $key = array_keys($model->jumlah)[$i];
+
+                                                if (-1 * $diff > $currJumlah) {
+                                                    $diff += $currJumlah;
+
+                                                    DetailBarang::modifyStock(intval($key), $currJumlah);
+
+                                                    unset ($currJumlah);
+
+                                                    continue;
+                                                }
+
+                                                $currJumlah += $diff;
+
+                                                DetailBarang::modifyStock(intval($key), $currJumlah);
+                                            }
+                                        } else {
+                                            end(array: $model->jumlah);
+                                            $key = key($model->jumlah);
+
+                                            $model->jumlah[$key] += $diff;
+
+                                            DetailBarang::modifyStock(intval($key), -1 * $diff);
                                         }
-
-                                        // Add new jumlah to other barang stock
-                                        Barang::modifyStock($data['barang_id'], -1 * $data['jumlah']);
+                                    } else {
+                                        // Modify detail barang stocks
+                                        foreach ($model->jumlah as $key => $value) {
+                                            // Assume data json would be like this:
+                                            // [
+                                            //      "id": jumlah_val,
+                                            //      .
+                                            //      .
+                                            // ]
+                                            // So, id would be a string, while jumlah_val always an integer
+                                            DetailBarang::modifyStock(intval($key), $value);
+                                        }
                                     }
+
+                                    $model->jumlah = json_encode($model->jumlah);
 
                                     return $data;
                                 }
@@ -188,86 +280,106 @@ class PenjualanResource extends Resource
                                     ->inlineLabel()
                                     ->extraAttributes(['class' => 'text-right font-semibold'])
                                     ->content(function (Get $get) {
-                                        $sum = 0;
+                                        $total =
+                                            collect($get('detail_penjualan'))->pluck('sub_total')->map(fn(?string $subTotal) =>
+                                                intval(str_replace(',', '', $subTotal)));
+                                        $total = $total->sum();
 
-                                        $pembelians = $get('detail_penjualan');
-
-                                        foreach ($pembelians as $data) {
-                                            $sum += $data['sub_total'];
-                                        }
-
-                                        return 'Rp ' . number_format($sum, 0, '.', '.');
+                                        return 'Rp ' . number_format($total, 0, '.', '.');
                                     })
                             ]),
                     ])
             ]);
     }
 
-    private static function getSubTotal($jumlah, $barang, $hargaJual = null)
+    private static function sumJumlah(array $data): int
     {
-        if ($hargaJual == null) {
-            $hargaJual = $barang->harga_jual;
-        }
+        // Assume data json would be like this:
+        // [
+        //      "id": jumlah_val,
+        //      .
+        //      .
+        // ]
 
-        // Beware that 0 cannot be used in divsion and modulo cannot
-        if ($barang->jumlah_per_grosir > 0) {
-            $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
-            $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
-
-            return ($jumlahGrosir * $barang->harga_grosir) + ($remainingJumlah * $hargaJual);
-        }
-
-        return $jumlah * $hargaJual;
+        return array_sum(array_values($data));
     }
 
-    private static function updateDatasPrimary(Get $get, Set $set)
+    private static function updateDatas(Get $get, Set $set)
     {
         $barangId = $get('barang_id');
 
         if (!empty($barangId)) {
             $barang = Barang::find($barangId);
+            $detailBarangs = $barang->detailBarangs()->get();
+
+            $jumlah = intval($get('jumlah'));
+
+            // There are 2 types of barang, newest and oldest
+            // So, each barang should and ONLY contains these 2 detail barangs
+
+            // Set harga_jual to the newest detail_barang
+            if ($jumlah > $detailBarangs->first()->stock) {
+                $set('harga_jual', $detailBarangs->last()->harga_jual);
+            } else {
+                $set('harga_jual', $detailBarangs->first()->harga_jual);
+            }
+        } else {
+            $set('harga_jual', 0);
+        }
+
+        self::setSubTotal($get, $set);
+    }
+
+    private static function setSubTotal(Get $get, Set $set)
+    {
+        $barangId = $get('barang_id');
+
+        if (!empty($barangId)) {
+            $barang = Barang::find($barangId);
+            $detailBarangs = $barang->detailBarangs()->get();
+
+            $jumlah = intval($get('jumlah'));
+            $hargaJual = intval(str_replace(',', '', $get('harga_jual')));
 
             // The math function can be describes as
             // sub_total = (jumlah_grosir * harga_grosir) + (remaining_jumlah * harga_beli),
             // where jumlah_grosir = jumlah / jumlah_per_grosir
             // remaining_jumlah = jumlah % jumlah_grosir
 
-            $jumlah = intval($get('jumlah'));
+            if ($barang->jumlah_per_grosir > 1) {
+                $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
+                $remainingJumlah = $jumlah - ($jumlahGrosir * $barang->jumlah_per_grosir);
 
-            $set('harga_jual', $barang->harga_jual);
-            $set('sub_total', self::getSubTotal($jumlah, $barang));
-        } else {
-            $set('harga_jual', 0);
-            $set('sub_total', 0);
+                if ($jumlah > $detailBarangs->first()->stock) {
+                    $set('sub_total', ($jumlahGrosir * $detailBarangs->last()->harga_grosir)
+                        + ($remainingJumlah * $hargaJual));
+
+                    return;
+                }
+
+                $set('sub_total', ($jumlahGrosir * $detailBarangs->first()->harga_grosir)
+                    + ($remainingJumlah * $hargaJual));
+
+                return;
+            }
+
+            $set('sub_total', ($jumlah * $hargaJual));
+
+            return;
         }
+
+        $set('sub_total', 0);
     }
 
-    private static function updateDatasSecondary(Get $get, Set $set)
-    {
-        $barangId = $get('barang_id');
-
-        if (!empty($barangId)) {
-            $barang = Barang::find($barangId);
-            $jumlah = intval($get('jumlah'));
-
-            $set(
-                'sub_total',
-                self::getSubTotal(
-                    $jumlah,
-                    $barang,
-                    intval(str_replace(',', '', $get('harga_jual')))
-                )
-            );
-        }
-    }
-
-    private static function deletePenjualan(Penjualan $record)
+    public static function deletePenjualan(Penjualan $record)
     {
         $detailPenjualans = $record->detailPenjualans()->get();
 
-        foreach ($detailPenjualans as $data) {
-            if (($barangId = $data->barang_id) != null) {
-                Barang::modifyStock($barangId, $data->jumlah);
+        // Iterate through all detail penjualans
+        foreach ($detailPenjualans as $detail) {
+            // Iterate through detail barangs
+            foreach ($detail->detail_barangs as $key => $value) {
+                DetailBarang::modifyStock(intval($key), $value);
             }
         }
 
@@ -278,85 +390,85 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no_nota')->label('Nomor Nota')
-                    ->searchable(),
-                TextColumn::make('invoice.no_invoice')->label('Nomor Invoice')
-                    ->searchable(),
-                TextColumn::make('created_at')->label('Tanggal Penjualan')
-                    ->date('d M Y')->sortable(),
-                TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
-                    ->searchable(),
-                TextColumn::make('total_pembelian')->label('Total Pembelian')
-                    ->money('Rp ')->default(0)->placeholder('-')
-                    ->getStateUsing(
-                        fn(Penjualan $model) => $model->detailPenjualans()->sum('sub_total')
-                    )->sortable(),
-                TextColumn::make('user.username')->label('Kasir')
-                    ->color(
-                        function (Penjualan $model) {
-                            return (User::find($model->user_id)->email != null) ?
+                    TextColumn::make('no_nota')->label('Nomor Nota')
+                        ->searchable(),
+                    TextColumn::make('invoice.no_invoice')->label('Nomor Invoice')
+                        ->searchable(),
+                    TextColumn::make('created_at')->label('Tanggal Penjualan')
+                        ->date('d M Y')->sortable(),
+                    TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
+                        ->searchable(),
+                    TextColumn::make('total_pembelian')->label('Total Pembelian')
+                        ->money('Rp ')->default(0)->placeholder('-')
+                        ->getStateUsing(
+                            fn(Penjualan $model) => $model->detailPenjualans()->sum('sub_total')
+                        )->sortable(),
+                    TextColumn::make('user.username')->label('Kasir')
+                        ->color(
+                            function (Penjualan $model) {
+                                return (User::find($model->user_id)->email != null) ?
                                 Color::Green : Color::Amber;
-                        }
-                    ),
-            ])
+                            }
+                        ),
+                ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                MultiSelectFilter::make('user_id')->label('Username Kasir')
-                    ->relationship(
-                        'user',
-                        'username',
-                        fn(Builder $query) => $query
-                            ->join('karyawans', 'users.id', '=', 'karyawans.user_id', 'left')
-                            ->where('email', '<>', 'NULL')
-                            ->orWhere('karyawans.tipe', '=', 'Kasir')
-                    )
-                    ->preload()->searchable(),
-                Filter::make('created_at')
-                    ->form([
-                        DatePicker::make('created_from')->label('Periode Awal')
-                            ->placeholder('mm / dd / yy')->native(false),
-                        DatePicker::make('created_until')->label('Periode Akhir')
-                            ->placeholder('mm / dd / yy')->native(false)
-                            ->minDate(fn(Get $get) => $get('created_from')),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    })
-            ])
+                    MultiSelectFilter::make('user_id')->label('Username Kasir')
+                        ->relationship(
+                            'user',
+                            'username',
+                            fn(Builder $query) => $query
+                                ->join('karyawans', 'users.id', '=', 'karyawans.user_id', 'left')
+                                ->where('email', '<>', 'NULL')
+                                ->orWhere('karyawans.tipe', '=', 'Kasir')
+                        )
+                        ->preload()->searchable(),
+                    Filter::make('created_at')
+                        ->form([
+                                DatePicker::make('created_from')->label('Periode Awal')
+                                    ->placeholder('mm / dd / yy')->native(false),
+                                DatePicker::make('created_until')->label('Periode Akhir')
+                                    ->placeholder('mm / dd / yy')->native(false)
+                                    ->minDate(fn(Get $get) => $get('created_from')),
+                            ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->when(
+                                    $data['created_from'],
+                                    fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                )
+                                ->when(
+                                    $data['created_until'],
+                                    fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                );
+                        })
+                ])
             ->actions([
-                Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Penjualan')
-                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
-            ])
+                    Tables\Actions\EditAction::make()->color('white'),
+                    Tables\Actions\Action::make('delete')->label('Hapus')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Data Penjualan')
+                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                        ->modalButton('Hapus')
+                        ->modalCloseButton()
+                        ->modalCancelActionLabel('Batalkan')
+                        ->icon('heroicon-c-trash')->color('danger')
+                        ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
+                ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Penjualan yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(function (Collection $records) {
-                        $records->each(fn(Penjualan $record) =>
-                            self::deletePenjualan($record));
-                    }),
-            ]);
+                    BulkAction::make('delete')->label('Hapus')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Data Penjualan yang Terpilih')
+                        ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                        ->modalButton('Hapus')
+                        ->modalCloseButton()
+                        ->modalCancelActionLabel('Batalkan')
+                        ->icon('heroicon-c-trash')->color('danger')
+                        ->action(function (Collection $records) {
+                            $records->each(fn(Penjualan $record) =>
+                                self::deletePenjualan($record));
+                        }),
+                ]);
     }
 
     public static function getRelations(): array

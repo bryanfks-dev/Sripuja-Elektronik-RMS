@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('detail_penjualans', function (Blueprint $table) {
             $table->id();
-            $table->integer('barang_id')->nullable()->unsigned()->index();
-            $table->integer('penjualan_id')->nullable()->unsigned()->index();
-            $table->integer('jumlah')->unsigned();
+            $table->integer('barang_id')->unsigned()->nullable()->index();
+            $table->integer('penjualan_id')->unsigned()->nullable()->index();
+            $table->json('jumlah');
             $table->integer('harga_jual')->unsigned();
             $table->integer('sub_total')->unsigned();
 

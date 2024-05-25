@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\DetailBarang;
 use App\Models\Nota;
 use Filament\Tables;
 use App\Models\Barang;
@@ -11,10 +12,8 @@ use Filament\Forms\Form;
 use App\Models\Pembelian;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use App\Models\DetailPembelian;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
@@ -48,15 +47,13 @@ class PembelianResource extends Resource
 
     protected static ?string $navigationLabel = 'Pembelian';
 
-    protected static array $statues = [
+    public static array $statues = [
         'Belum Lunas' => 'Belum Lunas',
         'Lunas' => 'Lunas'
     ];
 
     public static function form(Form $form): Form
     {
-        $isUpdate = $form->getOperation() === 'update';
-
         return $form
             ->schema([
                 Section::make('Data Pembelian')
@@ -75,7 +72,7 @@ class PembelianResource extends Resource
                             ->placeholder('mm-dd-yy')->minDate(now())
                             ->closeOnDateSelection()->required(),
                         Select::make('supplier_id')->label('Nama Supplier')
-                            ->relationship('supplier', 'nama')
+                            ->relationship('supplier', 'nama_supplier')
                             ->searchable()->preload()->native(false)
                             ->createOptionForm(
                                 fn(Form $form) => SupplierResource::form($form)
@@ -95,32 +92,58 @@ class PembelianResource extends Resource
                             ->minItems(1)
                             ->headers([
                                 Header::make('barang_id')->label('Nama Barang')
-                                    ->width('50%')->markAsRequired(),
-                                Header::make('jumlah')->width('10%')
+                                    ->width('20%')->markAsRequired(),
+                                Header::make('jumlah')->markAsRequired(),
+                                Header::make('harga_beli')->label('Harga Beli')
+                                    ->markAsRequired(),
+                                Header::make('harga_jual')->label('Harga Jual')
+                                    ->markAsRequired(),
+                                Header::make('harga_grosir')->label('Harga Grosir')
                                     ->markAsRequired(),
                                 Header::make('sub_total')->label('Sub Total')
                                     ->markAsRequired(),
                             ])
                             ->schema([
-                                Select::make('barang_id')->relationship('barang', 'nama_barang')
+                                Select::make('barang_id')->options(
+                                    Barang::all()->pluck('nama_barang', 'id')
+                                )
                                     ->createOptionForm(
                                         fn(Form $form) => BarangResource::form($form)
+                                            ->model(Barang::class)
                                             ->columns(['md' => 2])
                                     )
-                                    ->live()->afterStateUpdated(
-                                        function (Get $get, Set $set) {
-                                            self::updateDatas($get, $set);
-                                        }
-                                    )
-                                    ->native(false)->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                    ->required(),
+                                    ->createOptionUsing(function ($data) {
+                                        $newBarang = Barang::create($data);
+
+                                        return $newBarang->id;
+                                    })
+                                    ->searchable()->live(true)->native(false)
+                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                    ->afterStateUpdated(
+                                        fn(Get $get, Set $set) =>
+                                        self::updateDatas($get, $set)
+                                    ),
                                 TextInput::make('jumlah')->numeric()->default(1)
-                                    ->minValue(1)->live()->afterStateUpdated(
-                                        function (Get $get, Set $set) {
-                                            self::updateDatas($get, $set);
-                                        }
-                                    )
-                                    ->required(),
+                                    ->minValue(1)->live(true, 600)
+                                    ->disabled(fn(Get $get) => ($get('barang_id') == null))
+                                    ->afterStateUpdated(
+                                        fn(Get $get, Set $set) => self::setSubTotal($get, $set)
+                                    ),
+                                TextInput::make('harga_beli')->numeric()->prefix('Rp ')
+                                    ->default(0)->mask(RawJs::make('$money($input)'))
+                                    ->minValue(1)->stripCharacters(',')
+                                    ->disabled(fn(Get $get) => ($get('barang_id') == null))
+                                    ->live(true)->afterStateUpdated(
+                                        fn(Get $get, Set $set) => self::setSubTotal($get, $set)
+                                    ),
+                                TextInput::make('harga_jual')->prefix('Rp ')
+                                    ->default(0)->numeric()->mask(RawJs::make('$money($input)'))
+                                    ->disabled(fn(Get $get) => ($get('barang_id') == null))
+                                    ->minValue(1)->stripCharacters(','),
+                                TextInput::make('harga_grosir')->prefix('Rp ')
+                                    ->default(0)->numeric()->mask(RawJs::make('$money($input)'))
+                                    ->disabled(fn(Get $get) => ($get('barang_id') == null))
+                                    ->minValue(1)->stripCharacters(','),
                                 TextInput::make('sub_total')->prefix('Rp ')
                                     ->default(0)->numeric()->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')->readOnly(),
@@ -128,58 +151,9 @@ class PembelianResource extends Resource
                             ->columnSpan('full')->stackAt(MaxWidth::Medium)
                             ->createItemButtonLabel('Tambah Pembelian')
                             ->emptyLabel('Tidak ada detail pembelian')
-                            ->deleteAction(function(Action $action) {
-                                $action->before(function($state, array $arguments) {
-                                    $record = $state[$arguments['item']];
-
-                                    if (isset($record['id']) && isset($record['barang_id'])) {
-                                        Barang::modifyStock($record['barang_id'], -1 * $record['jumlah']);
-                                    }
-                                });
-                            })
                             // Mutate data before save in create mode
                             ->mutateRelationshipDataBeforeCreateUsing(
-                                function (array $data) {
-                                    Barang::modifyStock($data['barang_id'], $data['jumlah']);
-
-                                    return $data;
-                                }
-                            )
-                            // Mutate Data before save in editing mode
-                            ->mutateRelationshipDataBeforeSaveUsing(
-                                function (array $data, DetailPembelian $model) {
-                                    dd($data . '.' . $model);
-                                    // There 2 likely case when user updating things
-                                    // First, whether user upadting the indetifier
-                                    // Second, user not updating the indetifier
-
-                                    // In this context, barang_id is the identifier of
-                                    // the record
-
-                                    $model = $model->getOriginal();
-
-                                    // User not changing the nama_barang
-                                    if ($model['barang_id'] == $data['barang_id']) {
-                                        // For updating stock value, we could asume for n is stock value
-                                        // and new n = n + x, with x is a difference between old and new
-                                        // value of jumlah in detail_pembelian.
-
-                                        // Calculate difference value between old and new value
-                                        $diff = $data['jumlah'] - $model['jumlah'];
-
-                                        Barang::modifyStock($data['barang_id'], $diff);
-                                    } else {
-                                        if ($model['barang_id'] != null) {
-                                            // Normalize barang stock
-                                            Barang::modifyStock($model['barang_id'], -1 * $model['jumlah']);
-                                        }
-
-                                        // Add new jumlah to other barang stock
-                                        Barang::modifyStock($data['barang_id'], $data['jumlah']);
-                                    }
-
-                                    return $data;
-                                }
+                                fn(array $data) => self::createRecord($data)
                             ),
                         Section::make()
                             ->extraAttributes(['class' => '!mt-6'])
@@ -188,60 +162,85 @@ class PembelianResource extends Resource
                                     ->inlineLabel()
                                     ->extraAttributes(['class' => 'text-right font-semibold'])
                                     ->content(function (Get $get) {
-                                        $sum = 0;
+                                        $total =
+                                            collect($get('detail_pembelian'))->pluck('sub_total')->map(fn(?string $subTotal) =>
+                                                intval(str_replace(',', '', $subTotal)));
+                                        $total = $total->sum();
 
-                                        $pembelians = $get('detail_pembelian');
-
-                                        foreach ($pembelians as $data) {
-                                            $sum += $data['sub_total'];
-                                        }
-
-                                        return 'Rp ' . number_format($sum, 0, '.', '.');
+                                        return 'Rp ' . number_format($total, 0, '.', '.');
                                     })
                             ]),
                     ])
             ]);
     }
 
-    private static function updateDatas(Get $get, Set $set)
+    public static function updateDatas(Get $get, Set $set)
     {
         $barangId = $get('barang_id');
 
         if (!empty($barangId)) {
+            // Get related barang in detail_barang
             $barang = Barang::find($barangId);
+            $detailBarang = $barang->detailBarangs()->latest()->first();
 
-            // The math function can be describes as
-            // sub_total = (jumlah_grosir * harga_grosir) + (remaining_jumlah * harga_beli),
-            // where jumlah_grosir = jumlah / jumlah_per_grosir
-            // remaining_jumlah = jumlah % jumlah_grosir
-
-            $jumlah = intval($get('jumlah'));
-
-            // Beware that 0 cannot be used in divsion and modulo cannot
-            if ($barang->jumlah_per_grosir > 0) {
-                $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
-                $remainingJumlah = $jumlah % $barang->jumlah_per_grosir;
-
-                $set('sub_total', ($jumlahGrosir * $barang->harga_grosir)
-                    + ($remainingJumlah * $barang->harga_beli));
-
-                return;
+            if (isset($detailBarang)) {
+                $set('harga_beli', $detailBarang->harga_beli);
+                $set('harga_jual', $detailBarang->harga_jual);
+                $set('harga_grosir', $detailBarang->harga_grosir);
+            } else {
+                $set('harga_beli', 0);
+                $set('harga_jual', 0);
+                $set('harga_grosir', 0);
             }
 
-            $set('sub_total', ($jumlah * $barang->harga_beli));
+            self::setSubTotal($get, $set);
+        }
+    }
+
+    public static function createRecord(array $data)
+    {
+        // Add detail barang
+        $detailBarangId =
+        DetailBarang::create([
+            'barang_id' => $data['barang_id'],
+            'stock' => $data['jumlah'],
+            'harga_beli' => $data['harga_beli'],
+            'harga_jual' => $data['harga_jual'],
+            'harga_grosir' => $data['harga_grosir'],
+        ]);
+
+        $data['detail_barang_id'] = $detailBarangId->id;
+
+        unset (
+            $data['barang_id'],
+            $data['harga_beli'],
+            $data['harga_jual'],
+            $data['harga_grosir']
+        );
+
+        return $data;
+    }
+
+    public static function setSubTotal(Get $get, Set $set)
+    {
+        $barangId = $get('barang_id');
+        $jumlah = intval($get('jumlah'));
+        $hargaBeli = intval(str_replace(',', '', $get('harga_beli')));
+
+        if (!empty($barangId) && $jumlah > 0 && $hargaBeli > 0) {
+            $set('sub_total', $jumlah * $hargaBeli);
         } else {
             $set('sub_total', 0);
         }
     }
 
-    private static function deletePembelian(Pembelian $record)
+    public static function deletePembelian(Pembelian $record)
     {
         $detailPembelians = $record->detailPembelians()->get();
 
-        foreach ($detailPembelians as $data) {
-            if (($barangId = $data->barang_id) != null) {
-                Barang::modifyStock($barangId, -1 * $data->jumlah);
-            }
+        // Delete detail barangs
+        foreach ($detailPembelians as $detail) {
+            DetailBarang::destroy($detail->id);
         }
 
         $record->delete();
@@ -257,7 +256,7 @@ class PembelianResource extends Resource
                     ->date('d M Y')->sortable(),
                 TextColumn::make('jatuh_tempo')->label('Jatuh Tempo')
                     ->date('d M Y')->sortable(),
-                TextColumn::make('supplier.nama')->label('Nama Supplier')
+                TextColumn::make('supplier.nama_supplier')->label('Nama Supplier')
                     ->searchable(),
                 TextColumn::make('status')->label('Status Pembayaran')
                     ->badge(),
@@ -301,7 +300,8 @@ class PembelianResource extends Resource
                     ->modalCloseButton()
                     ->modalCancelActionLabel('Batalkan')
                     ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Pembelian $record) => self::deletePembelian($record)),
+                    ->action(fn(Pembelian $record) =>
+                        self::deletePembelian($record)),
             ])
             ->bulkActions([
                 BulkAction::make('delete')->label('Hapus')
