@@ -14,6 +14,11 @@ class DataPenjualanChart extends ChartWidget
 
     protected static ?string $heading = 'Grafik Data Penjualan';
 
+    public static function canView(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     public ?string $filter = 'year';
 
     // change font size

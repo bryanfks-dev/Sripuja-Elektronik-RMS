@@ -30,6 +30,11 @@ class MerekBarangResource extends Resource
 
     protected static ?string $slug = 'merek-barang';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     public static function form(Form $form): Form
     {
         return $form

@@ -51,6 +51,11 @@ class PenjualanResource extends Resource
 
     protected static ?string $navigationLabel = 'Penjualan';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isKaryawanKasir();
+    }
+
     public static function form(Form $form): Form
     {
         return $form

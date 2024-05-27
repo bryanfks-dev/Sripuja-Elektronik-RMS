@@ -14,6 +14,11 @@ class DataPembelianChart extends ChartWidget
 
     protected static ?string $heading = 'Grafik Laporan Pembelian';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     public ?string $filter = 'year';
 
     // change font size

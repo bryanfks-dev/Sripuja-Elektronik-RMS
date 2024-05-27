@@ -17,6 +17,11 @@ class CheckInKaryawan extends Widget
 
     protected array|string|int $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->isAdmin();
+    }
+
     protected function getViewData(): array
     {
         return [

@@ -34,12 +34,9 @@ class AbsensiResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function canViewAny(): bool
     {
-        return $form
-            ->schema([
-                //
-            ]);
+        return auth()->user()->isAdmin();
     }
 
     private static function ubahAbsensi(Karyawan $record)

@@ -14,6 +14,11 @@ class AdminDashboardHeaderStats extends BaseWidget
 {
     protected static bool $isLazy = false;
 
+    public static function canView(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     protected function getStats(): array
     {
         $totalPenjualan = DetailPenjualan::sum('sub_total');

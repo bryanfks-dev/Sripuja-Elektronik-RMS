@@ -15,4 +15,8 @@ class MasterKaryawan extends Cluster
     protected static ?string $slug = 'relasi/karyawan';
 
     protected static ?int $navigationSort = 1;
+
+    public static function canAccessClusteredComponents(): bool {
+        return auth()->user()->isAdmin();
+    }
 }

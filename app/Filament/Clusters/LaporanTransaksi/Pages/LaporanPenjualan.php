@@ -23,6 +23,11 @@ class LaporanPenjualan extends Page
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     protected function getHeaderWidgets(): array
     {
         return [

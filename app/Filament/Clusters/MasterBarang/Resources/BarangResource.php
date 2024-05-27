@@ -30,6 +30,11 @@ class BarangResource extends Resource
 
     protected static ?string $slug = 'data-barang';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     public static function form(Form $form): Form
     {
         return $form

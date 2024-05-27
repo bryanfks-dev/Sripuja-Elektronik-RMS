@@ -8,10 +8,8 @@ use Filament\Forms\Form;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\SupplierResource\Pages;
 
 class SupplierResource extends Resource
@@ -29,6 +27,11 @@ class SupplierResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-s-building-office-2';
 
     protected static ?string $navigationLabel = 'Supplier';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
 
     public static function form(Form $form): Form
     {

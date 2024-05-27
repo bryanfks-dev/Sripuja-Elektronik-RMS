@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -51,6 +50,24 @@ class User extends Authenticatable implements HasName
     public function getFilamentName(): string
     {
         return $this->getAttributeValue('username');
+    }
+
+    public function isAdmin():bool
+    {
+        return $this->email !== null &&
+            $this->karyawan()->first() === null;
+    }
+
+    public function isKaryawanNonKasir():bool
+    {
+        return $this->email === null &&
+            $this->karyawan()->first('tipe')->tipe === 'Non-Kasir';
+    }
+
+    public function isKaryawanKasir():bool
+    {
+        return $this->email === null &&
+            $this->karyawan()->first('tipe')->tipe === 'Kasir';
     }
 
     public function karyawan(): HasOne
