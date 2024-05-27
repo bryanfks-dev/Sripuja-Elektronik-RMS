@@ -17,7 +17,7 @@
                         </svg>
                         <div class="flex flex-col">
                             <span class="text-xs text-gray-700 dark:text-gray-400">Tanggal</span>
-                            <span>{{ date('l, d-m-Y') }}</span>
+                            <span>{{ now()->translatedFormat('l, d M Y') }}</span>
                         </div>
                     </div>
                     {{-- Waktu --}}
@@ -64,7 +64,7 @@
                             </svg>
                             <div class="flex flex-col">
                                 <span class="text-xs text-gray-700 dark:text-gray-400">Status Kehadiran</span>
-                                <span>Absensi hari ini</span>
+                                <span>Belum Absen</span>
                             </div>
                         @endif
                     </div>
