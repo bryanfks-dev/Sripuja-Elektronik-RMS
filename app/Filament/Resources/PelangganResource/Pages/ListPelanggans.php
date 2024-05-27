@@ -14,7 +14,7 @@ class ListPelanggans extends ListRecords
     {
         return [
             Actions\CreateAction::make('create')
-                ->icon('heroicon-m-plus')->label('Tambah Pelanggan')
+                ->icon('heroicon-m-plus')->label('Buat Pelanggan')
         ];
     }
 }

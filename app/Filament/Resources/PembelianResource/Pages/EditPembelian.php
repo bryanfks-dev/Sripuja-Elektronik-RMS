@@ -10,10 +10,8 @@ use App\Models\Barang;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
-use Illuminate\Support\Js;
 use Filament\Support\RawJs;
 use App\Models\DetailBarang;
-use Filament\Actions\Action;
 use App\Models\DetailPembelian;
 use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\DB;
@@ -37,26 +35,10 @@ class EditPembelian extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->label('Hapus')
+            Actions\DeleteAction::make()
                 ->action(fn(Pembelian $record) =>
                     PembelianResource::deletePembelian($record)),
         ];
-    }
-
-    protected function getSaveFormAction(): Action
-    {
-        return Action::make('save')
-            ->label('Simpan')
-            ->submit('save')
-            ->keyBindings(['mod+s']);
-    }
-
-    protected function getCancelFormAction(): Action
-    {
-        return Action::make('cancel')
-            ->label('Batalkan')
-            ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
-            ->color('gray');
     }
 
     public function form(Form $form): Form
@@ -128,7 +110,7 @@ class EditPembelian extends EditRecord
                                     ->native(false)->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                     ->required(),
                                 TextInput::make('jumlah')->numeric()->default(1)
-                                    ->minValue(1)->live(true,600)
+                                    ->minValue(1)->live(true, 600)
                                     ->disabled(fn(Get $get) => ($get('barang_id') == null))
                                     ->afterStateUpdated(
                                         fn(Get $get, Set $set) =>
@@ -159,7 +141,7 @@ class EditPembelian extends EditRecord
                                             ->first(['detail_pembelians.id', 'detail_pembelians.detail_barang_id']);
 
                                     // Delete detail barang
-                                    if (isset($queryRes)) {
+                                    if (isset ($queryRes)) {
                                         try {
                                             DB::beginTransaction();
 

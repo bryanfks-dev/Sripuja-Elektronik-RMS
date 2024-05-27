@@ -14,7 +14,7 @@ class ListPembelians extends ListRecords
     {
         return [
             Actions\CreateAction::make('create')
-                ->icon('heroicon-m-plus')->label('Tambah Pembelian')
+                ->icon('heroicon-m-plus')->label('Buat Pembelian')
         ];
     }
 }

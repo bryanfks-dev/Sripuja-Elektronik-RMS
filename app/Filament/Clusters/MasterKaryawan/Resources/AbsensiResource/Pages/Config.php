@@ -25,7 +25,7 @@ class Config extends Page implements HasForms
 
     protected static string $view = 'filament.clusters.master-karyawan.resources.absensi-resource.pages.config';
 
-    protected ?string $heading = 'Pengaturan';
+    protected ?string $heading = 'Konfigurasi';
 
     public static array $json;
 
@@ -64,7 +64,7 @@ class Config extends Page implements HasForms
                 ->label('Simpan')
                 ->submit('save'),
             Action::make('cancel')
-                ->label('Batalkan')
+                ->label('Batal')
                 ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
                 ->color('gray')
         ];

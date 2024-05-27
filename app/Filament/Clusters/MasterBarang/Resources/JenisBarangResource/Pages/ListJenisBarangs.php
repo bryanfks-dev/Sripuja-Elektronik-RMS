@@ -14,7 +14,7 @@ class ListJenisBarangs extends ListRecords
     {
         return [
             Actions\CreateAction::make('create')
-                ->icon('heroicon-m-plus')->label('Tambah Jenis Barang')
+                ->icon('heroicon-m-plus')->label('Buat Jenis Barang')
         ];
     }
 }

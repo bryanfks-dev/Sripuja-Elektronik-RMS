@@ -24,7 +24,7 @@ class CustomDashboard extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            CheckInKaryawan::class,
+            /* CheckInKaryawan::class, */
             AdminDashboardHeaderStats::class,
             DataPenjualanChart::class,
         ];

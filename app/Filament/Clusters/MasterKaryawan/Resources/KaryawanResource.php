@@ -80,17 +80,7 @@ class KaryawanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Karyawan')
-                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(function (Karyawan $record) {
-                        $record->delete();
-                    }),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkAction::make('delete')->label('Hapus')

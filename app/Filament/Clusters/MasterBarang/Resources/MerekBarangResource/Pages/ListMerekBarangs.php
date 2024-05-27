@@ -14,7 +14,7 @@ class ListMerekBarangs extends ListRecords
     {
         return [
             Actions\CreateAction::make('create')
-                ->icon('heroicon-m-plus')->label('Tambah Merek Barang')
+                ->icon('heroicon-m-plus')->label('Buat Merek Barang')
         ];
     }
 }

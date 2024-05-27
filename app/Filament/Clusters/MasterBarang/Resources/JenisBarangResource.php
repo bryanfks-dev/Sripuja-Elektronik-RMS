@@ -4,15 +4,14 @@ namespace App\Filament\Clusters\MasterBarang\Resources;
 
 use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use App\Models\JenisBarang;
 use Filament\Resources\Resource;
 use App\Filament\Clusters\MasterBarang;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\SubNavigationPosition;
-use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Clusters\MasterBarang\Resources\JenisBarangResource\Pages;
 
 class JenisBarangResource extends Resource
@@ -57,28 +56,10 @@ class JenisBarangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Jenis Barang')
-                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                        ->modalButton('Hapus')
-                        ->modalCloseButton()
-                        ->modalCancelActionLabel('Batalkan')
-                        ->icon('heroicon-c-trash')->color('danger')
-                        ->action(function (JenisBarang $record) {
-                            $record->delete();
-                        }),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Jenis Barang yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Collection $records) => $records->each->delete()),
+                DeleteBulkAction::make()
             ]);
     }
 

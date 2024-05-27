@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Tables;
 use App\Models\Supplier;
 use Filament\Forms\Form;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkAction;
@@ -84,29 +85,11 @@ class SupplierResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()->color('white'),
-                    Tables\Actions\Action::make('delete')->label('Hapus')
-                            ->requiresConfirmation()
-                            ->modalHeading('Hapus Data Supplier')
-                            ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                            ->modalButton('Hapus')
-                            ->modalCloseButton()
-                            ->modalCancelActionLabel('Batalkan')
-                            ->icon('heroicon-c-trash')->color('danger')
-                            ->action(function (Supplier $record) {
-                                $record->delete();
-                            }),
+                    Tables\Actions\DeleteAction::make(),
                 ])
             ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Supplier yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Collection $records) => $records->each->delete()),
+                DeleteBulkAction::make()
             ]);
     }
 

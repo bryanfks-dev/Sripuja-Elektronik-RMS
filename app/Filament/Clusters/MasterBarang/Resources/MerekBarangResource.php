@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\MasterBarang\Resources;
 
 use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use App\Models\MerekBarang;
 use Filament\Resources\Resource;
@@ -57,28 +58,10 @@ class MerekBarangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Merek Barang')
-                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                        ->modalButton('Hapus')
-                        ->modalCloseButton()
-                        ->modalCancelActionLabel('Batalkan')
-                        ->icon('heroicon-c-trash')->color('danger')
-                        ->action(function (MerekBarang $record) {
-                            $record->delete();
-                        }),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Merek Barang yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Collection $records) => $records->each->delete()),
+                DeleteBulkAction::make(),
             ]);
     }
 

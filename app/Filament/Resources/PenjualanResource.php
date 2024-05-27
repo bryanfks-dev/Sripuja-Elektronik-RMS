@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Models\DetailBarang;
 use App\Models\Nota;
 use App\Models\User;
-use Database\Factories\PenjualanFactory;
 use Filament\Tables;
 use App\Models\Barang;
 use App\Models\Invoice;
@@ -35,7 +34,6 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
-use Illuminate\Database\Eloquent\Model;
 
 class PenjualanResource extends Resource
 {
@@ -445,7 +443,7 @@ class PenjualanResource extends Resource
                 ])
             ->actions([
                     Tables\Actions\EditAction::make()->color('white'),
-                    Tables\Actions\Action::make('delete')->label('Hapus')
+                    Tables\Actions\Action::make('delete')
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Data Penjualan')
                         ->modalSubheading('Konfirmasi untuk menghapus data ini')
@@ -456,7 +454,7 @@ class PenjualanResource extends Resource
                         ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
                 ])
             ->bulkActions([
-                    BulkAction::make('delete')->label('Hapus')
+                    BulkAction::make('delete')
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Data Penjualan yang Terpilih')
                         ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')

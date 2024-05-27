@@ -6,9 +6,7 @@ use App\Models\User;
 use Filament\Actions;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
-use Illuminate\Support\Js;
 use Filament\Support\RawJs;
-use Filament\Actions\Action;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
@@ -23,7 +21,7 @@ class EditKaryawan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->label('Hapus'),
+            Actions\DeleteAction::make()
         ];
     }
 
@@ -70,21 +68,5 @@ class EditKaryawan extends EditRecord
                         }
                     })
             ]);
-    }
-
-    protected function getSaveFormAction(): Action
-    {
-        return Action::make('save')
-            ->label('Simpan')
-            ->submit('save')
-            ->keyBindings(['mod+s']);
-    }
-
-    protected function getCancelFormAction(): Action
-    {
-        return Action::make('cancel')
-            ->label('Batalkan')
-            ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
-            ->color('gray');
     }
 }

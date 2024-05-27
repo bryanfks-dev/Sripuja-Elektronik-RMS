@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\MasterBarang\Resources\BarangResource\RelationManagers;
 
-use App\Models\Barang;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -20,7 +19,7 @@ class DetailBarangsRelationManager extends RelationManager
 
     protected static string $relationship = 'detailBarangs';
 
-    protected static ?string $title = 'Barang';
+    protected static ?string $title = 'Detail Barang';
 
     public function form(Form $form): Form
     {

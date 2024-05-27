@@ -292,16 +292,7 @@ class PembelianResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Pembelian')
-                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Pembelian $record) =>
-                        self::deletePembelian($record)),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkAction::make('delete')->label('Hapus')
