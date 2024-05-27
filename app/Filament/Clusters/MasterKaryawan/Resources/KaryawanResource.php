@@ -2,14 +2,17 @@
 
 namespace App\Filament\Clusters\MasterKaryawan\Resources;
 
+use Filament\Tables\Actions\DeleteBulkAction;
+use Throwable;
 use Filament\Tables;
 use App\Models\Karyawan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Clusters\MasterKaryawan;
@@ -66,6 +69,27 @@ class KaryawanResource extends Resource
             ]);
     }
 
+    public static function deleteKaryawan(Karyawan $record)
+    {
+        try {
+            DB::beginTransaction();
+
+            $record->user()->delete();
+
+            DB::commit();
+        } catch (Halt $exception) {
+            $exception->shouldRollbackDatabaseTransaction() ?
+                DB::rollBack() :
+                DB::commit();
+
+            return;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            throw $exception;
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -76,8 +100,8 @@ class KaryawanResource extends Resource
                 TextColumn::make('no_hp')->label('Nomor Hp')->searchable(),
                 TextColumn::make('tipe')->label('Pekerjaan')
                     ->badge()->searchable(),
-                TextColumn::make('gaji_bln_ini')->label('Gaji Bulan Ini')->money('Rp ')
-                    ->sortable(),
+                TextColumn::make('gaji_bln_ini')->label('Gaji Bulan Ini')
+                    ->money('Rp ')->sortable(),
             ])
             ->filters([
                 SelectFilter::make('tipe')->label('Pekerjaan')
@@ -85,18 +109,15 @@ class KaryawanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->action(fn(Karyawan $record) =>
+                        self::deleteKaryawan($record)),
             ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Karyawan yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Collection $records) => $records->each->delete()),
+                DeleteBulkAction::make()
+                    ->action(fn(Collection $records) =>
+                        $records->each(fn(Karyawan $record) =>
+                            self::deleteKaryawan($record))),
             ]);
     }
 

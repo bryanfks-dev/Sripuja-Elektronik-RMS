@@ -22,6 +22,8 @@ class EditKaryawan extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
+                ->action(fn(Karyawan $reocrd) =>
+                    KaryawanResource::deleteKaryawan($record))
         ];
     }
 

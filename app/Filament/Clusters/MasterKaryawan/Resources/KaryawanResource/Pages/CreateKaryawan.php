@@ -13,12 +13,10 @@ class CreateKaryawan extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data):array
     {
-        $user = [
+        $user = User::create([
             'username' => Karyawan::createUsername($data['nama_lengkap']),
             'password' => Karyawan::createPassword($data['no_hp']),
-        ];
-
-        $user = User::create($user);
+        ]);
 
         $data['user_id'] = $user->id;
 

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Models\DetailBarang;
 use App\Models\Nota;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
 use Filament\Tables;
 use App\Models\Barang;
 use App\Models\Invoice;
@@ -12,6 +13,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\Penjualan;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use App\Models\DetailPenjualan;
@@ -22,7 +24,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
@@ -486,29 +487,18 @@ class PenjualanResource extends Resource
             )
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\Action::make('delete')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Penjualan')
-                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
+                DeleteAction::make()
+                    ->action(
+                        fn(Penjualan $record) => self::deletePenjualan($record)
+                    ),
             ])
             ->bulkActions([
-                BulkAction::make('delete')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Penjualan yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(function (Collection $records) {
+                DeleteBulkAction::make()
+                    ->action(
+                        fn(Collection $records) =>
                         $records->each(fn(Penjualan $record) =>
-                            self::deletePenjualan($record));
-                    }),
+                            self::deletePenjualan($record))
+                    ),
             ]);
     }
 

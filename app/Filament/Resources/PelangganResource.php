@@ -65,7 +65,7 @@ class PelangganResource extends Resource
                     ->money('Rp ')->default(0)
                     ->getStateUsing(
                         fn(Pelanggan $model) =>
-                        $model->detailPenjualans()->sum('sub_total')
+                            $model->detailPenjualans()->sum('sub_total')
                     )
                     ->sortable(),
             ])

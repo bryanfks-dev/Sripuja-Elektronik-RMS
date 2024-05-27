@@ -10,6 +10,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\Pembelian;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
@@ -18,7 +19,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
@@ -206,17 +206,17 @@ class PembelianResource extends Resource
     {
         // Add detail barang
         $detailBarangId =
-        DetailBarang::create([
-            'barang_id' => $data['barang_id'],
-            'stock' => $data['jumlah'],
-            'harga_beli' => $data['harga_beli'],
-            'harga_jual' => $data['harga_jual'],
-            'harga_grosir' => $data['harga_grosir'],
-        ]);
+            DetailBarang::create([
+                'barang_id' => $data['barang_id'],
+                'stock' => $data['jumlah'],
+                'harga_beli' => $data['harga_beli'],
+                'harga_jual' => $data['harga_jual'],
+                'harga_grosir' => $data['harga_grosir'],
+            ]);
 
         $data['detail_barang_id'] = $detailBarangId->id;
 
-        unset (
+        unset(
             $data['barang_id'],
             $data['harga_beli'],
             $data['harga_jual'],
@@ -297,21 +297,17 @@ class PembelianResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->action(fn(Pembelian $record) =>
+                        self::deletePembelian($record)),
             ])
             ->bulkActions([
-                BulkAction::make('delete')->label('Hapus')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Pembelian yang Terpilih')
-                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                    ->modalButton('Hapus')
-                    ->modalCloseButton()
-                    ->modalCancelActionLabel('Batalkan')
-                    ->icon('heroicon-c-trash')->color('danger')
-                    ->action(function (Collection $records) {
+                DeleteBulkAction::make()
+                    ->action(
+                        fn(Collection $records) =>
                         $records->each(fn(Pembelian $record) =>
-                            self::deletePembelian($record));
-                    }),
+                            self::deletePembelian($record))
+                    ),
             ]);
     }
 
