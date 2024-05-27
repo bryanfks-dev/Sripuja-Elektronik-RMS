@@ -61,13 +61,13 @@ class User extends Authenticatable implements HasName
     public function isKaryawanNonKasir():bool
     {
         return $this->email === null &&
-            $this->karyawan()->first('tipe')->tipe === 'Non-Kasir';
+            $this->karyawan()->first('tipe')->tipe->value === 'Non-Kasir';
     }
 
     public function isKaryawanKasir():bool
     {
         return $this->email === null &&
-            $this->karyawan()->first('tipe')->tipe === 'Kasir';
+            $this->karyawan()->first('tipe')->tipe->value === 'Kasir';
     }
 
     public function karyawan(): HasOne

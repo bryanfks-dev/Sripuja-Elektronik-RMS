@@ -53,7 +53,18 @@ class PenjualanResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()->isAdmin() || auth()->user()->isKaryawanKasir();
+        return auth()->user()->isAdmin() ||
+            auth()->user()->isKaryawanKasir();
+    }
+
+    public static function delete(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
+    public static function update(): bool
+    {
+        return auth()->user()->isAdmin();
     }
 
     public static function form(Form $form): Form
@@ -111,7 +122,7 @@ class PenjualanResource extends Resource
                                             $detailPenjualan = $data->detailPenjualans()
                                                 ->where('barang_id', '=', $barangId)->first();
 
-                                            if (isset($detailPenjualan)) {
+                                            if (isset ($detailPenjualan)) {
                                                 return Barang::find($barangId)->detailBarangs()->sum('stock')
                                                     + self::sumJumlah(json_decode($detailPenjualan->jumlah, true));
                                             }
@@ -121,7 +132,7 @@ class PenjualanResource extends Resource
                                     })->live(true, 600)
                                     ->afterStateUpdated(
                                         fn(Get $get, Set $set) =>
-                                            self::setSubTotal($get, $set)
+                                        self::setSubTotal($get, $set)
                                     )
                                     ->disabled(fn(Get $get) => ($get('barang_id') == null))
                                     ->required(),
@@ -129,8 +140,8 @@ class PenjualanResource extends Resource
                                     ->numeric()->default(0)->mask(RawJs::make('$money($input)'))
                                     ->stripCharacters(',')
                                     ->live(true, 600)->afterStateUpdated(
-                                        fn (Get $get, Set $set) =>
-                                            self::setSubTotal($get, $set)
+                                        fn(Get $get, Set $set) =>
+                                        self::setSubTotal($get, $set)
                                     )
                                     ->disabled(fn(Get $get) => ($get('barang_id') == null))
                                     ->required(),
@@ -151,11 +162,12 @@ class PenjualanResource extends Resource
                                 });
                             })
                             ->mutateRelationshipDataBeforeFillUsing(
-                                function(array $data) {
+                                function (array $data) {
                                     return [
                                         'barang_id' => $data['barang_id'],
                                         'jumlah' => self::sumJumlah(
-                                            json_decode($data['jumlah'], true)),
+                                            json_decode($data['jumlah'], true)
+                                        ),
                                         'harga_jual' => $data['harga_jual'],
                                         'sub_total' => $data['sub_total'],
                                     ];
@@ -391,87 +403,113 @@ class PenjualanResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $adminFilter = [
+            MultiSelectFilter::make('user_id')->label('Username Kasir')
+                ->relationship(
+                    'user',
+                    'username',
+                    fn(Builder $query) => $query
+                        ->join('karyawans', 'users.id', '=', 'karyawans.user_id', 'left')
+                        ->where('email', '<>', 'NULL')
+                        ->orWhere('karyawans.tipe', '=', 'Kasir')
+                )
+                ->preload()->searchable(),
+            Filter::make('created_at')
+                ->form([
+                    DatePicker::make('created_from')->label('Periode Awal')
+                        ->placeholder('mm / dd / yy')->native(false),
+                    DatePicker::make('created_until')->label('Periode Akhir')
+                        ->placeholder('mm / dd / yy')->native(false)
+                        ->minDate(fn(Get $get) => $get('created_from')),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['created_from'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                        );
+                })
+        ];
+
+        $karyawanFilter = [
+            Filter::make('created_at')
+                ->form([
+                    DatePicker::make('created_from')->label('Periode Awal')
+                        ->placeholder('mm / dd / yy')->native(false),
+                    DatePicker::make('created_until')->label('Periode Akhir')
+                        ->placeholder('mm / dd / yy')->native(false)
+                        ->minDate(fn(Get $get) => $get('created_from')),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['created_from'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                        );
+                })
+        ];
+
         return $table
             ->columns([
-                    TextColumn::make('no_nota')->label('Nomor Nota')
-                        ->searchable(),
-                    TextColumn::make('invoice.no_invoice')->label('Nomor Invoice')
-                        ->searchable(),
-                    TextColumn::make('created_at')->label('Tanggal Penjualan')
-                        ->date('d M Y')->sortable(),
-                    TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
-                        ->searchable(),
-                    TextColumn::make('total_pembelian')->label('Total Pembelian')
-                        ->money('Rp ')->default(0)->placeholder('-')
-                        ->getStateUsing(
-                            fn(Penjualan $model) => $model->detailPenjualans()->sum('sub_total')
-                        )->sortable(),
-                    TextColumn::make('user.username')->label('Kasir')
-                        ->color(
-                            function (Penjualan $model) {
-                                return (User::find($model->user_id)->email != null) ?
+                TextColumn::make('no_nota')->label('Nomor Nota')
+                    ->searchable(),
+                TextColumn::make('invoice.no_invoice')->label('Nomor Invoice')
+                    ->searchable(),
+                TextColumn::make('created_at')->label('Tanggal Penjualan')
+                    ->date('d M Y')->sortable(),
+                TextColumn::make('pelanggan.nama_lengkap')->label('Nama Pelanggan')
+                    ->searchable(),
+                TextColumn::make('total_pembelian')->label('Total Pembelian')
+                    ->money('Rp ')->default(0)->placeholder('-')
+                    ->getStateUsing(
+                        fn(Penjualan $model) => $model->detailPenjualans()->sum('sub_total')
+                    )->sortable(),
+                TextColumn::make('user.username')->label('Kasir')
+                    ->color(
+                        function (Penjualan $model) {
+                            return (User::find($model->user_id)->email != null) ?
                                 Color::Green : Color::Amber;
-                            }
-                        ),
-                ])
+                        }
+                    ),
+            ])
             ->defaultSort('created_at', 'desc')
-            ->filters([
-                    MultiSelectFilter::make('user_id')->label('Username Kasir')
-                        ->relationship(
-                            'user',
-                            'username',
-                            fn(Builder $query) => $query
-                                ->join('karyawans', 'users.id', '=', 'karyawans.user_id', 'left')
-                                ->where('email', '<>', 'NULL')
-                                ->orWhere('karyawans.tipe', '=', 'Kasir')
-                        )
-                        ->preload()->searchable(),
-                    Filter::make('created_at')
-                        ->form([
-                                DatePicker::make('created_from')->label('Periode Awal')
-                                    ->placeholder('mm / dd / yy')->native(false),
-                                DatePicker::make('created_until')->label('Periode Akhir')
-                                    ->placeholder('mm / dd / yy')->native(false)
-                                    ->minDate(fn(Get $get) => $get('created_from')),
-                            ])
-                        ->query(function (Builder $query, array $data): Builder {
-                            return $query
-                                ->when(
-                                    $data['created_from'],
-                                    fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                                )
-                                ->when(
-                                    $data['created_until'],
-                                    fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                                );
-                        })
-                ])
+            ->filters(
+                auth()->user()->isAdmin() ? $adminFilter : $karyawanFilter
+            )
             ->actions([
-                    Tables\Actions\EditAction::make()->color('white'),
-                    Tables\Actions\Action::make('delete')
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Data Penjualan')
-                        ->modalSubheading('Konfirmasi untuk menghapus data ini')
-                        ->modalButton('Hapus')
-                        ->modalCloseButton()
-                        ->modalCancelActionLabel('Batalkan')
-                        ->icon('heroicon-c-trash')->color('danger')
-                        ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
-                ])
+                Tables\Actions\EditAction::make()->color('white'),
+                Tables\Actions\Action::make('delete')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Penjualan')
+                    ->modalSubheading('Konfirmasi untuk menghapus data ini')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(fn(Penjualan $record) => self::deletePenjualan($record)),
+            ])
             ->bulkActions([
-                    BulkAction::make('delete')
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Data Penjualan yang Terpilih')
-                        ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
-                        ->modalButton('Hapus')
-                        ->modalCloseButton()
-                        ->modalCancelActionLabel('Batalkan')
-                        ->icon('heroicon-c-trash')->color('danger')
-                        ->action(function (Collection $records) {
-                            $records->each(fn(Penjualan $record) =>
-                                self::deletePenjualan($record));
-                        }),
-                ]);
+                BulkAction::make('delete')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Data Penjualan yang Terpilih')
+                    ->modalSubheading('Konfirmasi untuk menghapus data-data yang terpilih')
+                    ->modalButton('Hapus')
+                    ->modalCloseButton()
+                    ->modalCancelActionLabel('Batalkan')
+                    ->icon('heroicon-c-trash')->color('danger')
+                    ->action(function (Collection $records) {
+                        $records->each(fn(Penjualan $record) =>
+                            self::deletePenjualan($record));
+                    }),
+            ]);
     }
 
     public static function getRelations(): array
