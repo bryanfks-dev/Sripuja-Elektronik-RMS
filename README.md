@@ -1,6 +1,6 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# Sripuja Elektronik RMS
+# Sripuja Elektronik: Retail Management System
 
 Sripuja Elektronik is a retail store specializing in home appliances electronics and has been operating since 1999. In 2017, the store adopted an RMS system to automate administrative tasks. To meet the growing business needs, we have redeveloped the RMS software from scratch, enhancing the interface, performance, and features.
 
