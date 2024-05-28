@@ -65,5 +65,5 @@ Schedule::call(function () {
     );
 
 // Clear cache icon daily
-Schedule::call(Artisan::call('icons:cache'))
+Schedule::call(fn() => Artisan::call('icons:cache'))
     ->dailyAt('06:00');
