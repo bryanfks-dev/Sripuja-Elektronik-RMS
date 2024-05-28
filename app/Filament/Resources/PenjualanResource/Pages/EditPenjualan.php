@@ -21,13 +21,6 @@ class EditPenjualan extends EditRecord
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data['user_id'] = auth()->id();
-
-        return $data;
-    }
-
     protected function handleRecordUpdate(Model $record, array $data): Penjualan
     {
         // Remove no_invoice from data

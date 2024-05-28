@@ -72,6 +72,7 @@ class PelangganResource extends Resource
                     )
                     ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

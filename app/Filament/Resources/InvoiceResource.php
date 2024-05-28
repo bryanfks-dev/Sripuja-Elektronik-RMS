@@ -68,6 +68,9 @@ class InvoiceResource extends Resource
                     })
             ])
             ->actions([
+                Tables\Actions\Action::make('Kirim WA')->label('Kirim WA')
+                    ->icon('heroicon-s-cloud-arrow-up')->color('success')
+                    ->url(fn (Penjualan $record) => route('invoices.pdf.send-wa', $record->id)),
                 Tables\Actions\Action::make('Download PDF')->label('Download PDF')
                     ->icon('heroicon-s-document-arrow-down')->color('warning')
                     ->url(fn (Penjualan $record) => route('invoices.pdf.download', $record->id))

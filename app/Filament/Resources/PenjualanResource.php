@@ -109,7 +109,8 @@ class PenjualanResource extends Resource
                                     ->markAsRequired()
                             ])
                             ->schema([
-                                Select::make('barang_id')->relationship('barang', 'nama_barang')
+                                Select::make('barang_id')->relationship('barang', 'nama_barang',
+                                    fn(Builder $query) => $query->has('detailbarangs'))
                                     ->native(false)->preload()->searchable()
                                     ->live(true)->afterStateUpdated(
                                         function (Get $get, Set $set) {
@@ -328,17 +329,7 @@ class PenjualanResource extends Resource
             $barang = Barang::find($barangId);
             $detailBarangs = $barang->detailBarangs()->get();
 
-            $jumlah = intval($get('jumlah'));
-
-            // There are 2 types of barang, newest and oldest
-            // So, each barang should and ONLY contains these 2 detail barangs
-
-            // Set harga_jual to the newest detail_barang
-            if ($jumlah > $detailBarangs->first()->stock) {
-                $set('harga_jual', $detailBarangs->last()->harga_jual);
-            } else {
-                $set('harga_jual', $detailBarangs->first()->harga_jual);
-            }
+            $set('harga_jual', $detailBarangs->first()->harga_jual);
         } else {
             $set('harga_jual', 0);
         }
@@ -355,6 +346,17 @@ class PenjualanResource extends Resource
             $detailBarangs = $barang->detailBarangs()->get();
 
             $jumlah = intval($get('jumlah'));
+
+            // There are 2 types of barang, newest and oldest
+            // So, each barang should and ONLY contains these 2 detail barangs
+
+            // Set harga_jual to the newest detail_barang
+            if ($jumlah > $detailBarangs->first()->stock) {
+                $set('harga_jual', $detailBarangs->last()->harga_jual);
+            } else {
+                $set('harga_jual', $detailBarangs->first()->harga_jual);
+            }
+
             $hargaJual = intval(str_replace(',', '', $get('harga_jual')));
 
             // The math function can be describes as

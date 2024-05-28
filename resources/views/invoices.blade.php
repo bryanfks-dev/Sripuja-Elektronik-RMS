@@ -257,12 +257,12 @@
                         <td class="pl-0">
                             {{ $item->barang->nama_barang }}
                         </td>
-                        <td class="text-center">{{ $item->jumlah }}</td>
+                        <td class="text-center">{{ array_sum(array_values(json_decode($item->jumlah, true))) }}</td>
                         <td class="text-right">
                             {{ 'Rp ' . number_format($item->harga_jual, 0, '.', '.') }}
                         </td>
                         <td class="pr-0 text-right">
-                            {{ 'Rp ' . number_format($item->harga_jual * $item->jumlah, 0, '.', '.') }}
+                            {{ 'Rp ' . number_format($item->sub_total, 0, '.', '.') }}
                         </td>
                     </tr>
                 @endforeach
@@ -271,14 +271,7 @@
                     <td colspan="2" class="border-0"></td>
                     <td class="pl-0 text-right">Total Keseluruhan</td>
                     <td class="pr-0 text-right total-amount">
-                        <?php
-                            $total = 0;
-
-                            foreach ($detailPenjualans as $item) {
-                                $total += $item->harga_jual * $item->jumlah;
-                            }
-                            echo 'Rp ' . number_format($total, 0, '.', '.');
-                        ?>
+                        {{ 'Rp ' . number_format($detailPenjualans->sum('sub_total'), 0, '.', '.') }}
                     </td>
                 </tr>
             </tbody>
