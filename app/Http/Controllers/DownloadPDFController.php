@@ -28,7 +28,7 @@ class DownloadPDFController extends Controller
             'buyer_nohp' => $record->pelanggan->no_hp ?? '-',
             'buyer_fax' => $record->pelanggan->fax ?? '-',
             'date' => Carbon::parse($record->created_at)->translatedFormat('l, d M Y'),
-            'no_invoice' => 'okaoksd',
+            'no_invoice' => $record->invoice->no_invoice,
             'no_nota' => $record->no_nota,
             'detailPenjualans' => $detailPenjualans,
         ];
