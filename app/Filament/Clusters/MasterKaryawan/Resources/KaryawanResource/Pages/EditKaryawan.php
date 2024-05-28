@@ -58,7 +58,7 @@ class EditKaryawan extends EditRecord
                     ->schema([
                         TextInput::make('username')->label('Username')
                             ->readOnly()->required(),
-                        TextInput::make('password')->label('New Password')
+                        TextInput::make('password')->label('Password Baru')
                             ->password()->dehydrateStateUsing(
                                 fn($state): string => ($state != null) ? Hash::make($state) : ''
                             )

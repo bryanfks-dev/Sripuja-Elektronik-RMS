@@ -32,7 +32,7 @@ class Karyawan extends Model
 
     public static function createUsername($fullName)
     {
-        $username = explode(' ', $fullName);
+        $username = explode(' ', strtolower($fullName));
         $lastEle = end($username);
 
         if ($username[0] != $lastEle) {
