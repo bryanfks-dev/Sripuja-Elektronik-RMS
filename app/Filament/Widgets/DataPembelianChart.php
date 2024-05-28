@@ -19,7 +19,7 @@ class DataPembelianChart extends ChartWidget
         return auth()->user()->isAdmin();
     }
 
-    public ?string $filter = 'year';
+    public ?string $filter = 'month';
 
     // change font size
     protected static ?int $fontSize = 10;
@@ -37,17 +37,23 @@ class DataPembelianChart extends ChartWidget
         $data1 = collect();
         $data2 = collect();
 
-        $query = Trend::query(Pembelian::join(
+        $query1 = Trend::query(Pembelian::join(
             'detail_pembelians',
             'detail_pembelians.pembelian_id',
             '=',
             'pembelians.id'
-        )
-            ->groupBy('created_at'));
+        ));
+
+        $query2 = Trend::query(Pembelian::join(
+            'detail_pembelians',
+            'detail_pembelians.pembelian_id',
+            '=',
+            'pembelians.id'
+        ));
 
         if ($activeFilter == 'year') {
             $data1 =
-                $query->between(
+                $query1->between(
                     start: Carbon::now()->startOfYear(),
                     end: Carbon::now()->endOfYear(),
                 )
@@ -55,7 +61,7 @@ class DataPembelianChart extends ChartWidget
                     ->sum('sub_total');
 
             $data2 =
-                $query->between(
+                $query2->between(
                     start: Carbon::now()->subYear()->startOfYear(),
                     end: Carbon::now()->subYear()->endOfYear(),
                 )
@@ -66,7 +72,7 @@ class DataPembelianChart extends ChartWidget
             $label2 = Carbon::now()->subYear()->year;
         } else if ($activeFilter == 'month') {
             $data1 =
-                $query->between(
+                $query1->between(
                     start: Carbon::now()->startOfMonth(),
                     end: Carbon::now()->endOfMonth(),
                 )
@@ -74,7 +80,7 @@ class DataPembelianChart extends ChartWidget
                     ->sum('sub_total');
 
             $data2 =
-                $query->between(
+                $query2->between(
                     start: Carbon::now()->subMonth()->startOfMonth(),
                     end: Carbon::now()->subMonth()->endOfMonth(),
                 )
@@ -85,14 +91,14 @@ class DataPembelianChart extends ChartWidget
             $label2 = $date->subMonth()->format('F');
         } else if ($activeFilter == 'week') {
             $data1 =
-                $query->between(
+                $query1->between(
                     start: Carbon::now()->startOfWeek(),
                     end: Carbon::now()->endOfWeek(),
                 )
                     ->perDay()
                     ->sum('sub_total');
             $data2 =
-                $query->between(
+                $query2->between(
                     start: Carbon::now()->subWeek()->startOfWeek(),
                     end: Carbon::now()->subWeek()->endOfWeek(),
                 )
@@ -103,14 +109,14 @@ class DataPembelianChart extends ChartWidget
             $label2 = "Minggu Lalu";
         } else if ($activeFilter == 'today') {
             $data1 =
-                $query->between(
+                $query1->between(
                     start: Carbon::now()->startOfDay(),
                     end: Carbon::now()->endOfDay(),
                 )
                     ->perHour()
                     ->sum('sub_total');
             $data2 =
-                $query->between(
+                $query2->between(
                     start: Carbon::now()->subDay()->startOfDay(),
                     end: Carbon::now()->subDay()->endOfDay(),
                 )
@@ -122,7 +128,7 @@ class DataPembelianChart extends ChartWidget
 
         } else if ($activeFilter == 'last_year') {
             $data1 =
-                $query->between(
+                $query1->between(
                     start: Carbon::now()->subYear()->startOfYear(),
                     end: Carbon::now()->subYear()->endOfYear(),
                 )
@@ -130,7 +136,7 @@ class DataPembelianChart extends ChartWidget
                     ->sum('sub_total');
 
             $data2 =
-                $query->between(
+                $query2->between(
                     start: Carbon::now()->subYears(2)->startOfYear(),
                     end: Carbon::now()->subYears(2)->endOfYear(),
                 )

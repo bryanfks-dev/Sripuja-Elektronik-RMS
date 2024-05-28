@@ -20,7 +20,7 @@ class LabaChart extends ChartWidget
         return auth()->user()->isAdmin();
     }
 
-    public ?string $filter = 'year';
+    public ?string $filter = 'month';
 
     // change font size
     protected static ?int $fontSize = 10;
@@ -46,21 +46,33 @@ class LabaChart extends ChartWidget
         $laba1 = collect();
         $laba2 = collect();
 
-        $queryPenjualan = Trend::query(Penjualan::join(
+        $queryPenjualan1 = Trend::query(Penjualan::join(
             'detail_penjualans',
             'detail_penjualans.penjualan_id',
             '=',
             'penjualans.id'
-        )
-            ->groupBy('created_at'));
+        ));
 
-        $queryPembelian = Trend::query(Pembelian::join(
+        $queryPenjualan2 = Trend::query(Penjualan::join(
+            'detail_penjualans',
+            'detail_penjualans.penjualan_id',
+            '=',
+            'penjualans.id'
+        ));
+
+        $queryPembelian1 = Trend::query(Pembelian::join(
             'detail_pembelians',
             'detail_pembelians.pembelian_id',
             '=',
             'pembelians.id'
-        )
-            ->groupBy('created_at'));
+        ));
+
+        $queryPembelian2 = Trend::query(Pembelian::join(
+            'detail_pembelians',
+            'detail_pembelians.pembelian_id',
+            '=',
+            'pembelians.id'
+        ));
 
         if ($activeFilter == 'year') {
             $dateStart1 = Carbon::now()->startOfYear();
@@ -70,14 +82,14 @@ class LabaChart extends ChartWidget
             $dateEnd2 = Carbon::now()->subYear()->endOfYear();
 
             $jual1 =
-                $queryPenjualan->between(
+                $queryPenjualan1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
                     ->perMonth()->sum('sub_total');
 
             $beli1 =
-                $queryPembelian->between(
+                $queryPembelian1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -85,14 +97,14 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $jual2 =
-                $queryPenjualan->between(
+                $queryPenjualan2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
                     ->perMonth()->sum('sub_total');
 
             $beli2 =
-                $queryPembelian->between(
+                $queryPembelian2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -109,7 +121,7 @@ class LabaChart extends ChartWidget
             $dateEnd2 = Carbon::now()->subMonth()->endOfMonth();
 
             $jual1 =
-                $queryPenjualan->between(
+                $queryPenjualan1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -117,7 +129,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli1 =
-                $queryPenjualan->between(
+                $queryPembelian1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -125,7 +137,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $jual2 =
-                $queryPenjualan->between(
+                $queryPenjualan2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -133,7 +145,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli2 =
-                $queryPembelian->between(
+                $queryPembelian2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -150,7 +162,7 @@ class LabaChart extends ChartWidget
             $dateEnd2 = Carbon::now()->subWeek()->endOfWeek();
 
             $jual1 =
-                $queryPenjualan->between(
+                $queryPenjualan1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -158,7 +170,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli1 =
-                $queryPembelian->between(
+                $queryPembelian1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -166,7 +178,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $jual2 =
-                $queryPenjualan->between(
+                $queryPenjualan2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -174,7 +186,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli2 =
-                $queryPembelian->between(
+                $queryPembelian2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -191,7 +203,7 @@ class LabaChart extends ChartWidget
             $dateEnd2 = Carbon::now()->subDay()->endOfDay();
 
             $jual1 =
-                $queryPenjualan->between(
+                $queryPenjualan1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -199,7 +211,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli1 =
-                $queryPembelian->between(
+                $queryPembelian1->between(
                     start: $dateStart1,
                     end: $dateEnd1,
                 )
@@ -207,7 +219,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $jual2 =
-                $queryPenjualan->between(
+                $queryPenjualan2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
@@ -215,7 +227,7 @@ class LabaChart extends ChartWidget
                     ->sum('sub_total');
 
             $beli2 =
-                $queryPembelian->between(
+                $queryPembelian2->between(
                     start: $dateStart2,
                     end: $dateEnd2,
                 )
