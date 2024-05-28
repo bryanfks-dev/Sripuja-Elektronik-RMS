@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\CustomRequestResetPassword;
 use Filament\Panel;
 use Filament\PanelProvider;
 use App\Filament\Auth\CustomLogin;
@@ -11,7 +12,6 @@ use App\Filament\Pages\CustomEditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -34,7 +34,7 @@ class UserPanelProvider extends PanelProvider
             ->darkModeBrandLogo( asset('images/logo_dark.svg'))
             ->brandLogoHeight('2.8rem')
             ->login(CustomLogin::class)
-            ->passwordReset()
+            ->passwordReset(CustomRequestResetPassword::class)
             ->profile(CustomEditProfile::class)
             ->viteTheme('resources/css/filament/user/theme.css')
             // Sort navigation group
