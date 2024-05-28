@@ -16,11 +16,6 @@ The application consist of 8 critical features:
 7. **Attendance**
 8. **Chart & Stats**
 
-### Key Enhancements
-- **Revamped UI/UX**: Responsive design for various devices, dark mode, and latest design trends.
-- **Improved Database Design**: Adapted to accommodate the new and updated features.
-- **Advanced Features**: Resources management, enhanced reporting, and more.
-
 ## Installation Instructions
 
 To set up the application locally, follow these steps:
