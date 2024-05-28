@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('karyawans', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
             $table->bigInteger('user_id')->unsigned();
-            $table->string('nama_lengkap');
-            $table->string('alamat');
-            $table->string('telepon')->nullable();
-            $table->string('no_hp', 13);
+            $table->string('nama_lengkap')->index();
+            $table->string('alamat')->index();
+            $table->string('telepon')->nullable()->index();
+            $table->string('no_hp', 13)->index();
             $table->integer('gaji')->unsigned();
             $table->integer('gaji_bln_ini')->unsigned();
             $table->enum('tipe', ['Kasir','Non-Kasir'])
-                ->default('Non-Kasir');
+                ->default('Non-Kasir')->index();
 
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');

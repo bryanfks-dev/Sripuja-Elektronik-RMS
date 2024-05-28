@@ -63,3 +63,7 @@ Schedule::call(function () {
 })->dailyAt('23:30')->when(
         fn() => ConfigJson::loadJson()['otomasi']
     );
+
+// Clear cache icon daily
+Schedule::call(Artisan::call('icons:cache'))
+    ->dailyAt('06:00');

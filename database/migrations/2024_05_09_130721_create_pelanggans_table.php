@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('pelanggans', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->string('nama_lengkap');
-            $table->string('alamat')->nullable();
-            $table->string('telepon')->nullable();
-            $table->string('no_hp', 13)->nullable();
-            $table->string('fax')->nullable();
+            $table->string('nama_lengkap')->index();
+            $table->string('alamat')->nullable()->index();
+            $table->string('telepon')->nullable()->index();
+            $table->string('no_hp', 13)->nullable()->index();
+            $table->string('fax')->nullable()->index();
 
             $table->timestamps();
         });

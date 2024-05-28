@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('barangs', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->string('kode_barang')->unique();
-            $table->string('nama_barang');
-            $table->integer('merek_barang_id')->unsigned();
-            $table->integer('jenis_barang_id')->unsigned();
+            $table->string('kode_barang')->unique()->index();
+            $table->string('nama_barang')->index();
+            $table->integer('merek_barang_id')->unsigned()->index();
+            $table->integer('jenis_barang_id')->unsigned()->index();
             $table->integer('jumlah_per_grosir')->default(0);
 
             $table->foreign('merek_barang_id')->references('id')

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('penjualans', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->bigInteger('user_id')->nullable()->unsigned();
-            $table->integer('pelanggan_id')->nullable()->unsigned();
-            $table->string('no_nota')->unique();
+            $table->bigInteger('user_id')->nullable()->unsigned()->index();
+            $table->integer('pelanggan_id')->nullable()->unsigned()->index();
+            $table->string('no_nota')->unique()->index();
 
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('set null');

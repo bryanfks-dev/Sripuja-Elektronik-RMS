@@ -68,13 +68,18 @@ class SupplierResource extends Resource
                     ->searchable(),
                 TextColumn::make('nama_cv')->label('Nama CV')
                     ->searchable(),
-                TextColumn::make('alamat'),
-                TextColumn::make('telepon')->placeholder('-'),
-                TextColumn::make('no_hp')->label('Nomor Hp'),
-                TextColumn::make('fax')->placeholder('-'),
+                TextColumn::make('alamat')
+                    ->searchable(),
+                TextColumn::make('telepon')->placeholder('-')
+                    ->searchable(),
+                TextColumn::make('no_hp')->label('Nomor Hp')
+                    ->searchable(),
+                TextColumn::make('fax')->placeholder('-')
+                    ->searchable(),
                 TextColumn::make('nama_sales')->label('Nama Sales')
                     ->searchable(),
-                TextColumn::make('no_hp_sales')->label('Nomor Hp Sales'),
+                TextColumn::make('no_hp_sales')->label('Nomor Hp Sales')
+                    ->searchable(),
                 TextColumn::make('pembelian_terakhir')->label('Pembelian Terakhir')
                     ->date('d M Y')->placeholder('-')
                     ->getStateUsing(function (Supplier $model) {

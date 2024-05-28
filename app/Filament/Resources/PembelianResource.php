@@ -10,6 +10,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\Pembelian;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
@@ -257,6 +258,8 @@ class PembelianResource extends Resource
             ->columns([
                 TextColumn::make('no_nota')->label('Nomor Nota')
                     ->searchable(),
+                TextColumn::make('no_faktur')->label('Nomor Faktur')
+                    ->searchable(),
                 TextColumn::make('created_at')->label('Tanggal Pembelian')
                     ->date('d M Y')->sortable(),
                 TextColumn::make('jatuh_tempo')->label('Jatuh Tempo')
@@ -296,10 +299,12 @@ class PembelianResource extends Resource
                     })
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->color('white'),
-                Tables\Actions\DeleteAction::make()
-                    ->action(fn(Pembelian $record) =>
-                        self::deletePembelian($record)),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make()->color('white'),
+                    Tables\Actions\DeleteAction::make()
+                        ->action(fn(Pembelian $record) =>
+                            self::deletePembelian($record)),
+                ])
             ])
             ->bulkActions([
                 DeleteBulkAction::make()

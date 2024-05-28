@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('jenis_barangs', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->string('nama_jenis')->unique();
+            $table->string('nama_jenis')->unique()->index();
 
             $table->timestamps();
         });

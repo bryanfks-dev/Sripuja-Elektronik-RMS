@@ -56,11 +56,14 @@ class PelangganResource extends Resource
             ->columns([
                 TextColumn::make('nama_lengkap')->label('Nama')
                     ->searchable(),
-                TextColumn::make('alamat')->placeholder('-'),
-                TextColumn::make('telepon')->placeholder('-'),
+                TextColumn::make('alamat')->placeholder('-')
+                    ->searchable(),
+                TextColumn::make('telepon')->placeholder('-')
+                    ->searchable(),
                 TextColumn::make('no_hp')->label('Nomor Hp')
-                    ->placeholder('-'),
-                TextColumn::make('fax')->placeholder('-'),
+                    ->placeholder('-')->searchable(),
+                TextColumn::make('fax')->placeholder('-')
+                    ->searchable(),
                 TextColumn::make('total_pembelian')->label('Total Pembelian')
                     ->money('Rp ')->default(0)
                     ->getStateUsing(

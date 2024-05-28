@@ -4,7 +4,6 @@ namespace App\Filament\Clusters\MasterKaryawan\Resources;
 
 use App\Models\Absensi;
 use App\Models\Karyawan;
-use Filament\Forms\Form;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -60,13 +59,15 @@ class AbsensiResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama_lengkap')->label('Nama Karyawan'),
+                TextColumn::make('nama_lengkap')->label('Nama Karyawan')
+                    ->searchable(),
                 TextColumn::make('tanggal_waktu')->label('Waktu Absen')
                     ->placeholder('-')
                     ->date('H:i:s')
                     ->getStateUsing(function (Karyawan $model) {
                         $record = $model->absensis()
-                            ->whereDate('tanggal_waktu', '=', date('Y-m-d'))->get();
+                            ->whereDate('tanggal_waktu', '=', date('Y-m-d'))
+                            ->get();
 
                         if (!$record->isEmpty()) {
                             return $record[0]->tanggal_waktu;
@@ -115,11 +116,6 @@ class AbsensiResource extends Resource
                         $records->each(fn(Karyawan $record) => self::ubahAbsensi($record));
                     })
             ]);
-    }
-
-    private static function changePresentStatus($model)
-    {
-        dd($model);
     }
 
     public static function getRelations(): array

@@ -99,7 +99,7 @@ class KaryawanResource extends Resource
                 TextColumn::make('telepon')->searchable()->placeholder('-'),
                 TextColumn::make('no_hp')->label('Nomor Hp')->searchable(),
                 TextColumn::make('tipe')->label('Pekerjaan')
-                    ->badge()->searchable(),
+                    ->badge(),
                 TextColumn::make('gaji_bln_ini')->label('Gaji Bulan Ini')
                     ->money('Rp ')->sortable(),
             ])

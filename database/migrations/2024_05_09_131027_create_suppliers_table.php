@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->string('nama_supplier');
-            $table->string('nama_cv');
-            $table->string('alamat');
-            $table->string('telepon')->nullable();
-            $table->string('no_hp', 13);
-            $table->string('fax')->nullable();
-            $table->string('nama_sales');
-            $table->string('no_hp_sales', 13);
+            $table->string('nama_supplier')->index();
+            $table->string('nama_cv')->index();
+            $table->string('alamat')->index();
+            $table->string('telepon')->nullable()->index();
+            $table->string('no_hp', 13)->index();
+            $table->string('fax')->nullable()->index();
+            $table->string('nama_sales')->index();
+            $table->string('no_hp_sales', 13)->index();
 
             $table->timestamps();
         });

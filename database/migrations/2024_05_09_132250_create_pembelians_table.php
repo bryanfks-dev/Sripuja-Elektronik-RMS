@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('pembelians', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->integer('supplier_id')->nullable()->unsigned();
-            $table->string('no_nota')->unique();
-            $table->string('no_faktur')->unique();
+            $table->integer('supplier_id')->nullable()->unsigned()->index();
+            $table->string('no_nota')->unique()->index();
+            $table->string('no_faktur')->unique()->index();
             $table->date('jatuh_tempo');
             $table->enum('status', ['Belum Lunas','Lunas'])
                 ->default('Belum Lunas');

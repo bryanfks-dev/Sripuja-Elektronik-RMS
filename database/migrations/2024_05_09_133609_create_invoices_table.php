@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->integerIncrements('id')->primary();
-            $table->integer('penjualan_id')->unsigned();
-            $table->string('no_invoice');
+            $table->integer('penjualan_id')->unsigned()->index();
+            $table->string('no_invoice')->index();
 
             $table->foreign('penjualan_id')->references('id')
                 ->on('penjualans')->onDelete('cascade');
