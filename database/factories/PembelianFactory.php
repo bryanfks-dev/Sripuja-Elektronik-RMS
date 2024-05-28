@@ -22,6 +22,7 @@ class PembelianFactory extends Factory
             'jatuh_tempo' =>$this->faker->dateTimeBetween('now', '+2 months'),
             'no_faktur' => $this->faker->numberBetween(100000, 999999),
             'status' => $this->faker->randomElement(['Lunas', 'Belum Lunas']),
+            'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
         ];
     }
 }
