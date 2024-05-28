@@ -359,24 +359,32 @@ class PenjualanResource extends Resource
 
             $hargaJual = intval(str_replace(',', '', $get('harga_jual')));
 
-            // The math function can be describes as
-            // sub_total = (jumlah_grosir * harga_grosir) + (remaining_jumlah * harga_beli),
-            // where jumlah_grosir = jumlah / jumlah_per_grosir
-            // remaining_jumlah = jumlah % jumlah_grosir
-
             if ($barang->jumlah_per_grosir > 1) {
-                $jumlahGrosir = intdiv($jumlah, $barang->jumlah_per_grosir);
-                $remainingJumlah = $jumlah - ($jumlahGrosir * $barang->jumlah_per_grosir);
+                $totalHargaGrosir = 0;
 
-                if ($jumlah > $detailBarangs->first()->stock) {
-                    $set('sub_total', ($jumlahGrosir * $detailBarangs->last()->harga_grosir)
-                        + ($remainingJumlah * $hargaJual));
+                foreach ($detailBarangs as $detail) {
+                    if ($jumlah === 0) {
+                        break;
+                    }
 
-                    return;
+                    // The math function can be describes as
+                    // sub_total = (jumlah_grosir * harga_grosir) + (remaining_jumlah * harga_beli),
+                    // where jumlah_grosir = jumlah / jumlah_per_grosir
+                    // remaining_jumlah = jumlah % jumlah_grosir
+
+                    $jumlahGrosir = intdiv(min($detail->stock, $jumlah),
+                        $barang->jumlah_per_grosir);
+
+                    if ($jumlahGrosir === 0) {
+                        break;
+                    }
+
+                    $jumlah -= $jumlahGrosir * $barang->jumlah_per_grosir;
+
+                    $totalHargaGrosir += $jumlahGrosir * $detail->harga_grosir;
                 }
 
-                $set('sub_total', ($jumlahGrosir * $detailBarangs->first()->harga_grosir)
-                    + ($remainingJumlah * $hargaJual));
+                $set('sub_total', $totalHargaGrosir + ($jumlah * $hargaJual));
 
                 return;
             }
