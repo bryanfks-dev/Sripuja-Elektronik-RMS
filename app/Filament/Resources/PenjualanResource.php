@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Models\DetailBarang;
 use App\Models\Nota;
 use App\Models\User;
-use Filament\Actions\DeleteAction;
 use Filament\Tables;
 use App\Models\Barang;
 use App\Models\Invoice;
@@ -35,6 +34,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
+use Illuminate\Database\Eloquent\Model;
 
 class PenjualanResource extends Resource
 {
@@ -63,7 +63,7 @@ class PenjualanResource extends Resource
         return auth()->user()->isAdmin();
     }
 
-    public static function update(): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()->isAdmin();
     }
@@ -458,6 +458,14 @@ class PenjualanResource extends Resource
                 })
         ];
 
+        $actions = [
+            Tables\Actions\EditAction::make()->color('white'),
+            Tables\Actions\DeleteAction::make()
+                ->action(
+                    fn(Penjualan $record) => self::deletePenjualan($record)
+                ),
+        ];
+
         return $table
             ->columns([
                 TextColumn::make('no_nota')->label('Nomor Nota')
@@ -485,13 +493,7 @@ class PenjualanResource extends Resource
             ->filters(
                 auth()->user()->isAdmin() ? $adminFilter : $karyawanFilter
             )
-            ->actions([
-                Tables\Actions\EditAction::make()->color('white'),
-                DeleteAction::make()
-                    ->action(
-                        fn(Penjualan $record) => self::deletePenjualan($record)
-                    ),
-            ])
+            ->actions(auth()->user()->isAdmin() ? $actions : [])
             ->bulkActions([
                 DeleteBulkAction::make()
                     ->action(

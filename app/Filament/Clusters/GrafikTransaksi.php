@@ -4,11 +4,11 @@ namespace App\Filament\Clusters;
 
 use Filament\Clusters\Cluster;
 
-class LaporanTransaksi extends Cluster
+class GrafikTransaksi extends Cluster
 {
     protected static ?string $navigationIcon = 'heroicon-s-presentation-chart-line';
 
-    protected static ?string $slug = 'laporan';
+    protected static ?string $slug = 'grafik';
 
     protected static ?string $navigationGroup = 'Laporan Transaksi';
 

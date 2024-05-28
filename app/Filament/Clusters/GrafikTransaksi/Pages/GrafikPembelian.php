@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Filament\Clusters\LaporanTransaksi\Pages;
+namespace App\Filament\Clusters\GrafikTransaksi\Pages;
 
-use App\Filament\Widgets\DataPembelianChart;
 use Filament\Pages\Page;
-use App\Filament\Clusters\LaporanTransaksi;
 use Filament\Pages\SubNavigationPosition;
+use App\Filament\Clusters\GrafikTransaksi;
+use App\Filament\Widgets\DataPembelianChart;
 
-class LaporanPembelian extends Page
+class GrafikPembelian extends Page
 {
-    protected static string $view = 'filament.clusters.laporan-transaksi.pages.laporan-pembelian';
+    protected static string $view = 'filament.clusters.grafik-transaksi.pages.grafik-pembelian';
 
-    protected static ?string $cluster = LaporanTransaksi::class;
+    protected static ?string $cluster = GrafikTransaksi::class;
 
     protected static ?int $navigationSort = 2;
 
-    protected ?string $heading = 'Laporan Pembelian';
+    protected ?string $heading = 'Grafik Pembelian';
 
     protected static ?string $navigationLabel = 'Pembelian';
 

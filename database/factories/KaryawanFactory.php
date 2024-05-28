@@ -21,20 +21,16 @@ class KaryawanFactory extends Factory
         $noHp = $this->faker->numberBetween(62800000000, 6289999999999);
 
         return [
-            //
             'nama_lengkap' => $namaLengkap,
             'no_hp' => $noHp,
             'user_id' => User::factory()
                 ->withNamaLengkap($namaLengkap)
                 ->withNoHp($noHp),
-
             'alamat' => $this->faker->address(),
             'telepon' => $this->faker->phoneNumber(),
-
             'gaji' => $this->faker->numberBetween(10000, 100000),
             'gaji_bln_ini' => $this->faker->numberBetween(10000, 100000),
             'tipe' => $this->faker->randomElement(['Kasir', 'Non-Kasir']),
-
         ];
     }
 }

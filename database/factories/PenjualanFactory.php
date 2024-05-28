@@ -17,12 +17,9 @@ class PenjualanFactory extends Factory
     public function definition(): array
     {
         return [
-            //
             'user_id' => $this->faker->numberBetween(1, 13),
             'pelanggan_id' => $this->faker->numberBetween(1, 50),
             'no_nota' => $this->faker->numberBetween(100000, 999999),
-            'created_at' => $this->faker->dateTimeBetween('-2 years', 'now')
-
         ];
     }
 }

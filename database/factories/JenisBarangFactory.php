@@ -17,7 +17,6 @@ class JenisBarangFactory extends Factory
     public function definition(): array
     {
         return [
-            //
             'nama_jenis' => $this->faker->unique()->word(),
         ];
     }

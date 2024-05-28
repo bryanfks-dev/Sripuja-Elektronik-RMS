@@ -17,7 +17,6 @@ class MerekBarangFactory extends Factory
     public function definition(): array
     {
         return [
-            //
             'nama_merek' => $this->faker->unique()->company(),
         ];
     }

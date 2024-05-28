@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Filament\Clusters\LaporanTransaksi\Pages;
+namespace App\Filament\Clusters\GrafikTransaksi\Pages;
 
-use App\Filament\Widgets\LabaChart;
 use Filament\Pages\Page;
-use App\Filament\Clusters\LaporanTransaksi;
+use App\Filament\Widgets\LabaChart;
 use Filament\Pages\SubNavigationPosition;
+use App\Filament\Clusters\GrafikTransaksi;
 
-class LaporanLaba extends Page
+class GrafikLaba extends Page
 {
-    protected static string $view = 'filament.clusters.laporan-transaksi.pages.laporan-laba';
+    protected static string $view = 'filament.clusters.grafik-transaksi.pages.grafik-laba';
 
-    protected static ?string $cluster = LaporanTransaksi::class;
+    protected static ?string $cluster = GrafikTransaksi::class;
 
     protected static ?int $navigationSort = 3;
 
-    protected ?string $heading = 'Laporan Laba';
+    protected ?string $heading = 'Grafik Laba';
 
     protected static ?string $navigationLabel = 'Laba';
 

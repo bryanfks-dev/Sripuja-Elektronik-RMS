@@ -2,19 +2,21 @@
 
 namespace Database\Seeders;
 
-use App\Models\Absensi;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Barang;
-use App\Models\DetailPembelian;
-use App\Models\DetailPenjualan;
-use App\Models\JenisBarang;
+use App\Models\Absensi;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Invoice;
 use App\Models\Karyawan;
-use App\Models\MerekBarang;
+use App\Models\Supplier;
 use App\Models\Pelanggan;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
-use App\Models\Supplier;
+use App\Models\JenisBarang;
+use App\Models\MerekBarang;
+use App\Models\DetailBarang;
+use App\Models\DetailPembelian;
+use App\Models\DetailPenjualan;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -38,6 +40,8 @@ class DatabaseSeeder extends Seeder
 
         Barang::factory(25)->create();
 
+        DetailBarang::factory(10)->create();
+
         Karyawan::factory(12)->create();
 
         Absensi::factory(100)->create();
@@ -49,6 +53,8 @@ class DatabaseSeeder extends Seeder
         Penjualan::factory(300)->create();
 
         DetailPenjualan::factory(100)->create();
+
+        Invoice::factory(300)->create();
 
         Pembelian::factory(169)->create();
 

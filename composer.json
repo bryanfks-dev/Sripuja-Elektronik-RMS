@@ -10,6 +10,9 @@
     "require": {
         "php": "^8.2",
         "awcodes/filament-table-repeater": "^3.0",
+        "barryvdh/laravel-dompdf": "^2.1",
+        "codeat3/blade-fluentui-system-icons": "^1.33",
+        "dompdf/dompdf": "^2.0",
         "filament/filament": "^3.2",
         "flowframe/laravel-trend": "^0.2.0",
         "laravel/framework": "^11.0",

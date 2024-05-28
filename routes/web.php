@@ -1,8 +1,7 @@
 <?php
 
+use App\Http\Controllers\DownloadPDFController;
 use Illuminate\Support\Facades\Route;
 
-/* Route::get('/', function () {
-    return view('welcome');
-});
- */
+Route::get("/{record}/pdf/download", [DownloadPDFController::class, 'index'])
+    ->name('invoices.pdf.download');

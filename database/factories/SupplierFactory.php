@@ -17,15 +17,14 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
-            //
-            'nama' => $this->faker->name(),
+            'nama_supplier' => $this->faker->name(),
+            'nama_cv' => $this->faker->name(),
             'no_hp' => $this->faker->numberBetween(62800000000, 6289999999999),
             'alamat' => $this->faker->address(),
             'telepon' => $this->faker->phoneNumber(),
             'fax' => $this->faker->numberBetween(666, 999),
             'nama_sales' => $this->faker->name(),
             'no_hp_sales' => $this->faker->numberBetween(62800000000, 6289999999999),
-
         ];
     }
 }
