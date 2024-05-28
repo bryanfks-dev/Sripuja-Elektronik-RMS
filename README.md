@@ -2,7 +2,7 @@
 
 # Sripuja Elektronik: Retail Management System
 
-Sripuja Elektronik is a retail store specializing in home appliances electronics and has been operating since 1999. In 2017, the store adopted an RMS system to automate administrative tasks. To meet the growing business needs, we have redeveloped the RMS software from scratch, enhancing the interface, performance, and features.
+Sripuja Elektronik is a retail store specializing in home appliances electronics and has been operating since 1999. However, all administrative task have been done manually to date. To meet the growing business needs, we have developed a Retail Management System (RMS) software from scratch, providing an eye-candy UI/UX design, exceptional performance, and features that solve precise business challenges.
 
 ## Features
 
