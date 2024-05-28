@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><img src="https://raw.githubusercontent.com/bryanfks-dev/Sripuja-Elektronik-RMS/master/public/images/logo_dark.svg" width="400" alt="Sripuja Logo"></p>
 
 # Sripuja Elektronik: Retail Management System
 
