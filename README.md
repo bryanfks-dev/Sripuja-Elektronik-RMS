@@ -34,7 +34,50 @@ To set up the application locally, follow these steps:
 ### Steps
 
 1. **Clone the repository:**
-   ```bash
+   ```
    git clone https://github.com/yourusername/sripuja-elektronik-rms.git
    cd sripuja-elektronik-rms
    ```
+
+2. **Install PHP dependencies:**
+    ```
+    composer install
+    ```
+
+3. **Install JavaScript dependencies:**
+    ```
+    npm install
+    ```
+
+4. **Set up the environment file:**
+    ```
+    cp .env.example .env
+    ```
+
+5. **Generate application key:**
+    ```
+    php artisan key:generate
+    ```
+
+6. **Run migrations and seed the database:**
+    ```
+    php artisan migrate --seed
+    ```
+
+7. **Build assets:**
+    ```
+    npm run dev
+    ```
+
+8. **Start the development server:**
+    ```
+    php artisan serve
+    ```
+9. **Access the application:**
+Open your web browser and navigate to 'http://localhost:8000'
+
+## License
+This project is licensed under the Apache 2.0 License. See the LICENSE file for details.
+
+## Contact
+For any inquiries or feedback, please contact us at halo.sripuja@gmail.com
