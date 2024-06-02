@@ -86,7 +86,7 @@ class InvoiceController extends Controller
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => [
                 'messaging_product' => 'whatsapp',
@@ -97,6 +97,8 @@ class InvoiceController extends Controller
         ]);
 
         $result = json_decode(curl_exec($curl), true);
+
+        curl_close($curl);
 
         return $result['id'];
     }
@@ -137,19 +139,27 @@ class InvoiceController extends Controller
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($messageBody),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: Bearer $api[token]",
-                'Content-Type: application/json'
+                "Content-Type: application/json"
             ),
         ]);
 
-        curl_exec($curl);
+        $res = curl_exec($curl);
+        $err = curl_error($curl);
+
         curl_close($curl);
+
+        if ($err) {
+            dd("cURL error: " . $err);
+        } else {
+            echo $res;
+        }
 
         Storage::delete($invoicePath);
 
