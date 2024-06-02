@@ -1,8 +1,8 @@
 <p align="center"><img src="https://raw.githubusercontent.com/bryanfks-dev/Sripuja-Elektronik-RMS/master/public/images/logo_dark.svg" width="400" alt="Sripuja Logo"></p>
 
-# Sripuja Elektronik: Retail Management System
+# Sripuja Elektronik: Internal Retail System for Store Operational Management  
 
-Sripuja Elektronik is a retail store specializing in home appliances electronics and has been operating since 1999. However, all administrative task have been done manually to date. To meet the growing business needs, we have developed a Retail Management System (RMS) software from scratch, providing an eye-candy UI/UX design, exceptional performance, and features that solve precise business challenges.
+Sripuja Elektronik is a retail store specializing in home appliances electronics and has been operating since 1999. However, all administrative task have been done manually to date. In the face of growing digitalization, by adapting to technology to improve efficiency and accuracy in business operations. Digital transformation has become a necessity to maintain competitiveness and relevance in a dynamic market. By adopting an integrated and automated management system, Sripuja Elektronik is determined to improve its administrative processes, from recording employee attendance to analyzing business performance. To meet the growing business needs, we have developed a Retail Management System (RMS) software from scratch, We hope that Sripuja Elektronik will be able to solve problems related to store management such as providing an eye-candy UI/UX design, exceptional performance, and features that solve precise business challenges.
 
 ## Features
 
@@ -12,9 +12,9 @@ The application consist of 8 critical features:
 3. **Customer Management**
 4. **Supplier Management**
 5. **Transaction Management**
-6. **Reporting**
-7. **Attendance**
-8. **Chart & Stats**
+7. **Operational Report**
+8. **Attendance**
+9. **Chart & Stats**
 
 ## Installation Instructions
 
