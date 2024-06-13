@@ -59,16 +59,25 @@ To set up the application locally, follow these steps:
     php artisan migrate --seed
     ```
 
-7. **Build assets:**
+7. **Add new admin user:**
+   ```
+   php artisan app:create-admin
+   ```
+
+8. **Build assets:**
     ```
     npm run dev
     ```
 
-8. **Start the development server:**
+9. **Start the development server:**
     ```
     php artisan serve
     ```
-9. **Access the application:**
+10. **Start the cron job:**
+    ```
+    php artisan schedule:work
+    ```
+11. **Access the application:**
 Open your web browser and navigate to 'http://localhost:8000'
 
 ## License
